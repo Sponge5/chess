@@ -13,7 +13,7 @@
     <artifactId>prociada</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>???</name>
+    <name>prociada</name>
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -48,6 +48,17 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <arguments>
+                        <argument>-Xms512m</argument>
+                        <argument>-Xmx512m</argument>
+                        <argument>-XX:NewRatio=3</argument>
+                        <argument>-XX:+PrintGCTimeStamps</argument>
+                        <argument>-XX:+PrintGCDetails</argument>
+                        <argument>-Xloggc:gc.log</argument>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>Main</argument>
+                    </arguments>
                     <mainClass>Main</mainClass>
                 </configuration>
             </plugin>

@@ -40,30 +40,34 @@ public class Player implements PlayerIF {
                 switch (state[i][j]){
                     case 1:
                         /* pawns */
-                        this.pieces.add(new Pawn());
+                        this.pieces.add(new Pawn(color, i, j));
                         break;
                     case 2:
                         /* knights */
-                        this.pieces.add(new Knight());
+                        this.pieces.add(new Knight(color, i, j));
                         break;
                     case 3:
                         /* bishops */
-                        this.pieces.add(new Bishop());
+                        this.pieces.add(new Bishop(color, i, j));
                         break;
                     case 4:
                         /* rooks */
-                        this.pieces.add(new Rook());
+                        this.pieces.add(new Rook(color, i, j));
                         break;
                     case 5:
                         /* queen */
-                        this.pieces.add(new Queen());
+                        this.pieces.add(new Queen(color, i, j));
                         break;
                     case 6:
                         /* king */
-                        this.pieces.add(new King());
+                        this.pieces.add(new King(color, i, j));
                         break;
                 }
             }
         }
+    }
+
+    public void setState(Integer[][] state) {
+        this.state = state;
     }
 }

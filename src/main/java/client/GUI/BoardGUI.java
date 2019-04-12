@@ -1,4 +1,4 @@
-package Client.GUI;
+package client.GUI;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -7,7 +7,7 @@ import javafx.scene.layout.GridPane;
 public class BoardGUI extends GridPane {
     Integer[][] state;
 
-    BoardGUI(Integer[][] state){
+    public BoardGUI(Integer[][] state){
         this.state = state;
         this.setMinSize(320,320);
         this.setAlignment(Pos.CENTER);
