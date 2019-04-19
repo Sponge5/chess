@@ -31,8 +31,9 @@ Running server for server testing
 	mvn exec:java -Dexec.arguments=client
 `
 
-## How-to
 Run client and select new game, that's all the functionality right now.
 
 ## TODO
-Client creates it's own thread for server in case of game on 1 machine
+* [ ] Client creates it's own thread for server in case of game on 1 machine
+* [ ] Gui in own thread
+* [ ] Add modifiers to class datastructures (for security)

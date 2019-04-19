@@ -2,7 +2,7 @@ package server;
 
 import logic.Player;
 
-public class Board {
+class Board {
     /* solution
         Player implements PlayerIF
             color
@@ -17,9 +17,9 @@ public class Board {
             toString() and move(x,y)
             abstract class that is extended by (rook, bishop, queen, knight, pawn, king)
      */
-    Player whitePlayer;
-    Player blackPlayer;
-    Integer[][] state;
+    private Player whitePlayer;
+    private Player blackPlayer;
+    private Integer[][] state;
 
     Board(){
         /* default setup */
