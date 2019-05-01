@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Runner {
+public class Runner implements Runnable{
     public static void main(String[] args) throws Exception {
         ServerSocket welcomeSocket = new ServerSocket(8888);
         System.out.println(welcomeSocket.getLocalPort());
@@ -20,5 +20,13 @@ public class Runner {
         String clientSentence = inFromClient.readLine();
         String capitalizedSentence = clientSentence.toUpperCase() + '\n';
         outToClient.writeBytes(capitalizedSentence);
+    }
+
+    public void run() {
+        try{
+            main(null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

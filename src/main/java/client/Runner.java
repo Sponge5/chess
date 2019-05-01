@@ -6,7 +6,9 @@ import client.communication.Utils;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 
@@ -19,27 +21,40 @@ public class Runner extends Application{
         launch();
     }
 
-    public void start(final Stage stage) throws Exception {
+    public void start(final Stage stage) {
         this.ms = new MenuScreen();
+        this.ms.setVsComputerBtn(new Button("Player vs Computer"));
+        EventHandler<MouseEvent> vsCompBtnEh = new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent mouseEvent) {
+                System.out.println("Game vs computer clicked");
+                runGame(stage, false, true);
+            }
+        };
+        this.ms.setTwoPlayerBtn(new Button("Player vs Player"));
+        EventHandler<MouseEvent> twoPlayerBtnEh = new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent mouseEvent) {
+                System.out.println("Game vs player clicked");
+                runGame(stage, false, false);
+            }
+        };
+        this.ms.setTf(new TextField("Enter localhost port here"));
         this.ms.setEh(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent actionEvent) {
-                System.out.println("Text entered in TextField");
+                System.out.println("PortNum entered in TextField");
                 setPort(stage);
             }
         });
-        ms.setTf(new TextField("Enter localhost port here"));
-        ms.getTf().setOnAction(ms.getEh());
+        this.ms.getTf().setOnAction(this.ms.getEh());
+        this.ms.getVsComputerBtn().setOnMouseClicked(vsCompBtnEh);
+        this.ms.getTwoPlayerBtn().setOnMouseClicked(twoPlayerBtnEh);
         this.ms.mainMenu(stage);
-        //Thread.sleep(5000);
-        //System.out.println(this.port.toString());
     }
 
     private void setPort(final Stage stage){
         try {
-            /* TODO get port from user to connect to in the GUI*/
-            /* TODO if single game, run server from here */
+            /* get port from user to connect to in the GUI*/
             this.port = Integer.valueOf(ms.getTf().getText());
-            runGame(stage);
+            runGame(stage, true, false);
         }catch(Exception e){
             this.ms.getTf().setOnAction(this.ms.getEh());
             this.ms.setTf(new TextField("Try again"));
@@ -48,15 +63,25 @@ public class Runner extends Application{
         }
     }
 
-    private void runGame(Stage stage){
+    private void runGame(Stage stage, Boolean remote, Boolean computer){
         /* Garbage collector should clean ms */
         this.ms = null;
+        this.boardGUI = new BoardGUI(null);
         try {
-            new BoardGUI(null).start(stage);
+            this.boardGUI.start(stage);
         }catch (Exception e){
             e.printStackTrace();
         }
-        System.out.println(this.port.toString());
-        new Thread(new Utils(this.port)).start();
+        if(remote) {
+            /* TODO connect to server */
+            System.out.println(this.port.toString());
+            new Thread(new Utils(this.port)).start();
+        }else{
+            /* run server */
+            new Thread(new server.Runner()).start();
+            /* TODO get server port and connect to it */
+            this.port = 8888;
+            new Thread(new Utils(this.port)).start();
+        }
     }
 }

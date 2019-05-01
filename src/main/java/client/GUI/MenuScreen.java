@@ -15,7 +15,10 @@ public class MenuScreen{
     private Scene scene;
     private Text titleText;
     private GridPane pane;
-    private Button button1, button2, button3, button4;
+    /* button4 is reserved for "back to main menu" */
+    private Button  mainMenuBtn,
+                    vsComputerBtn,
+                    twoPlayerBtn;
     private TextField tf;
     private EventHandler<ActionEvent> eh;
 
@@ -25,20 +28,20 @@ public class MenuScreen{
         this.pane.setVgap(5);
         this.titleText = new Text("Main Menu");
         this.pane.add(this.titleText, 0, 0);
-        this.button1 = new Button("New Game");
-        this.button1.setOnMouseClicked(newHandler(1, stage));
-        this.pane.add(this.button1, 0, 1);
-        this.button2 = new Button("Load Game");
-        this.button2.setOnMouseClicked(newHandler(2, stage));
-        this.pane.add(this.button2, 0, 2);
-        this.button3 = new Button("Watch Game");
-        this.button3.setOnMouseClicked(newHandler(3, stage));
-        this.pane.add(this.button3, 0, 3);
+        Button newGameBtn = new Button("New Game");
+        newGameBtn.setOnMouseClicked(newHandler(1, stage));
+        this.pane.add(newGameBtn, 0, 1);
+        Button loadGameBtn = new Button("Load Game");
+        loadGameBtn.setOnMouseClicked(newHandler(2, stage));
+        this.pane.add(loadGameBtn, 0, 2);
+        Button watchGameBtn = new Button("Watch Game");
+        watchGameBtn.setOnMouseClicked(newHandler(3, stage));
+        this.pane.add(watchGameBtn, 0, 3);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
         stage.show();
-        this.button4 = new Button("Back to Main Menu");
-        this.button4.setOnMouseClicked(newHandler(0, stage));
+        this.mainMenuBtn = new Button("Back to Main Menu");
+        this.mainMenuBtn.setOnMouseClicked(newHandler(0, stage));
     }
 
     private EventHandler<MouseEvent> newHandler(int i, final Stage stage){
@@ -78,45 +81,53 @@ public class MenuScreen{
                         localGameMenu(stage);
                     }
                 };
+            case 5:
+                return new EventHandler<MouseEvent>() {
+                    public void handle(MouseEvent mouseEvent) {
+                        System.out.println("RemoteGame Button clicked");
+                        remoteGameMenu(stage);
+                    }
+                };
             default:
                 return null;
         }
     }
 
     private void newGameMenu(final Stage stage){
-        this.titleText = new Text("New Game Menu");
         this.pane = new GridPane();
         this.pane.setAlignment(Pos.CENTER);
         this.pane.setVgap(5);
-        this.button1 = new Button("Local Game");
-        this.button1.setOnMouseClicked(newHandler(4, stage));
-        this.button2 = new Button("Remote Game");
+        this.titleText = new Text("New Game Menu");
         this.pane.add(this.titleText, 0, 0);
-        this.pane.add(this.button1, 0, 1);
-        this.pane.add(this.button2, 0, 2);
-        this.pane.add(this.button4, 0, 3);
+        Button localGameBtn = new Button("Local Game");
+        localGameBtn.setOnMouseClicked(newHandler(4, stage));
+        this.pane.add(localGameBtn, 0, 1);
+        Button remoteGameBtn = new Button("Remote Game");
+        remoteGameBtn.setOnMouseClicked(newHandler(5, stage));
+        this.pane.add(remoteGameBtn, 0, 2);
+        this.pane.add(this.mainMenuBtn, 0, 3);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
     }
 
     private void loadGameMenu(final Stage stage){
-        this.titleText = new Text("Load Game Menu");
         this.pane = new GridPane();
         this.pane.setAlignment(Pos.CENTER);
         this.pane.setVgap(5);
+        this.titleText = new Text("Load Game Menu");
         this.pane.add(this.titleText, 0, 0);
-        this.pane.add(this.button4, 0, 1);
+        this.pane.add(this.mainMenuBtn, 0, 1);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
     }
 
     private void watchGameMenu(final Stage stage){
-        this.titleText = new Text("Watch Game Menu");
         this.pane = new GridPane();
         this.pane.setAlignment(Pos.CENTER);
         this.pane.setVgap(5);
+        this.titleText = new Text("Watch Game Menu");
         this.pane.add(this.titleText, 0, 0);
-        this.pane.add(this.button4, 0, 1);
+        this.pane.add(this.mainMenuBtn, 0, 1);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
     }
@@ -125,12 +136,31 @@ public class MenuScreen{
         this.pane = new GridPane();
         this.pane.setAlignment(Pos.CENTER);
         this.pane.setVgap(5);
-        this.pane.add(this.tf, 0, 0);
-        this.pane.add(this.button4, 0, 1);
+        this.titleText = new Text("Local Game Menu");
+        this.pane.add(this.titleText, 0, 0);
+        this.pane.add(this.vsComputerBtn, 0, 1);
+        this.pane.add(this.twoPlayerBtn, 0, 2);
+        this.pane.add(this.mainMenuBtn, 0, 3);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
     }
 
+    private void remoteGameMenu(final Stage stage){
+        this.pane = new GridPane();
+        this.pane.setAlignment(Pos.CENTER);
+        this.pane.setVgap(5);
+        this.pane.add(this.tf, 0, 0);
+        this.pane.add(this.mainMenuBtn, 0, 1);
+        this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
+        stage.setScene(this.scene);
+    }
+
+    public Button getVsComputerBtn(){
+        return this.vsComputerBtn;
+    }
+    public Button getTwoPlayerBtn(){
+        return this.twoPlayerBtn;
+    }
     public GridPane getPane(){
         return this.pane;
     }
@@ -145,5 +175,11 @@ public class MenuScreen{
     }
     public void setEh(EventHandler<ActionEvent> eh){
         this.eh = eh;
+    }
+    public void setVsComputerBtn(Button vsComputerBtn) {
+        this.vsComputerBtn = vsComputerBtn;
+    }
+    public void setTwoPlayerBtn(Button twoPlayerBtn) {
+        this.twoPlayerBtn = twoPlayerBtn;
     }
 }
