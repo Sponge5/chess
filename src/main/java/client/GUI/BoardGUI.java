@@ -1,5 +1,6 @@
 package client.GUI;
 
+import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,8 +13,15 @@ public class BoardGUI{
     private Integer[][] state;
     private Button saveGame;
 
-    public BoardGUI(Stage stage, Integer[][] state){
+    public BoardGUI(Integer[][] state){
         this.state = state;
+    }
+
+    public Integer[][] getState() {
+        return state;
+    }
+
+    public void start(Stage stage) throws Exception {
         this.pane = new GridPane();
         this.pane.setAlignment(Pos.CENTER);
         this.boardPane = new GridPane();
@@ -31,9 +39,4 @@ public class BoardGUI{
         this.scene = new Scene(this.pane);
         stage.setScene(this.scene);
     }
-
-    public Integer[][] getState() {
-        return state;
-    }
-
 }

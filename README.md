@@ -28,7 +28,7 @@ Running client
 Running server for server testing
 
 `
-	mvn exec:java -Dexec.arguments=client
+	mvn exec:java -Dexec.arguments=server
 `
 
 Run client and select new game, that's all the functionality right now.
