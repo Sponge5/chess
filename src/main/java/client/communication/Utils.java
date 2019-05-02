@@ -7,20 +7,29 @@ import java.net.Socket;
 
 public class Utils implements Runnable{
     private int port;
+    private Socket clientSocket;
+    private BufferedReader inFromServer;
+    private DataOutputStream outToServer;
+
+    public void sendState(Integer[][] state){
+        System.out.println(state.toString());
+        //outToServer.writeBytes(state.toString());
+    }
 
     public void connect() throws Exception {
-        /**TODO
-         * if game selected is on 1 machine, create thread with server running in background
-         */
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
 
-        Socket clientSocket = new Socket("localhost", this.port);
-        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        this.clientSocket = new Socket("localhost", this.port);
+        this.outToServer = new DataOutputStream(
+                this.clientSocket.getOutputStream()
+        );
+        this.inFromServer = new BufferedReader(
+                new InputStreamReader(this.clientSocket.getInputStream())
+        );
 
         String sentence = inFromUser.readLine();
         outToServer.writeBytes(sentence + '\n');
-        String modifiedSentence = inFromServer.readLine();
+        String modifiedSentence = this.inFromServer.readLine();
         System.out.println(modifiedSentence);
         clientSocket.close();
     }

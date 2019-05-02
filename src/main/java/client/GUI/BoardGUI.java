@@ -38,4 +38,10 @@ public class BoardGUI{
         this.scene = new Scene(this.pane);
         stage.setScene(this.scene);
     }
+
+    public void updateGUI(Integer[][] state){
+        /*TODO poll each square and for each piece that doesn't
+         *TODO correspond update button
+         */
+    }
 }

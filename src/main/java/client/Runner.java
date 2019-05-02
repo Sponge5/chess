@@ -10,12 +10,43 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import logic.Board;
+
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class Runner extends Application{
     private Integer port;
     private MenuScreen ms;
     private BoardGUI boardGUI;
+    private Board board;
+    private Thread  logicThread,
+                    cliThread,
+                    servThread;
+
+    private void runGame(Stage stage, Boolean remote, Boolean computer){
+        /* Garbage collector should clean ms */
+        this.ms = null;
+        this.boardGUI = new BoardGUI(null);
+        try {
+            this.boardGUI.start(stage);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(!remote) {
+            /* queue for server port */
+            LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
+            /* run server */
+            server.Runner server = new server.Runner();
+            this.port = server.getPort();
+            this.servThread = new Thread(server);
+            this.servThread.start();
+        }
+        this.cliThread = new Thread(new Utils(this.port));
+        this.cliThread.start();
+        this.logicThread = new Thread(new Board());
+        this.logicThread.start();
+    }
 
     public static void main(String[] args) throws Exception {
         launch();
@@ -60,28 +91,6 @@ public class Runner extends Application{
             this.ms.setTf(new TextField("Try again"));
             this.ms.getPane().add(this.ms.getTf(), 0, 0);
             this.ms.getTf().setOnAction(this.ms.getEh());
-        }
-    }
-
-    private void runGame(Stage stage, Boolean remote, Boolean computer){
-        /* Garbage collector should clean ms */
-        this.ms = null;
-        this.boardGUI = new BoardGUI(null);
-        try {
-            this.boardGUI.start(stage);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        if(remote) {
-            /* TODO connect to server */
-            System.out.println(this.port.toString());
-            new Thread(new Utils(this.port)).start();
-        }else{
-            /* run server */
-            new Thread(new server.Runner()).start();
-            /* TODO get server port and connect to it */
-            this.port = 8888;
-            new Thread(new Utils(this.port)).start();
         }
     }
 }

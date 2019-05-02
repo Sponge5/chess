@@ -1,5 +1,7 @@
 package server;
 
+import logic.Board;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -7,25 +9,37 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Runner implements Runnable{
-    public static void main(String[] args) throws Exception {
-        ServerSocket welcomeSocket = new ServerSocket(8888);
-        System.out.println(welcomeSocket.getLocalPort());
+    private ServerSocket serverSocket;
+    private Socket conSocket;
+    private Board board;
+    private Thread logicThread;
 
-        Socket connectionSocket = welcomeSocket.accept();
+    public Runner(){
+        try {
+            this.serverSocket = new ServerSocket(8888);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public int getPort(){
+        return this.serverSocket.getLocalPort();
+    }
 
+    private void setup() throws Exception{
+        this.conSocket = this.serverSocket.accept();
         BufferedReader inFromClient = new BufferedReader(
-                new InputStreamReader(connectionSocket.getInputStream()));
+                new InputStreamReader(this.conSocket.getInputStream()));
         DataOutputStream outToClient = new DataOutputStream(
-                connectionSocket.getOutputStream());
+                this.conSocket.getOutputStream());
         String clientSentence = inFromClient.readLine();
         String capitalizedSentence = clientSentence.toUpperCase() + '\n';
         outToClient.writeBytes(capitalizedSentence);
     }
 
     public void run() {
-        try{
-            main(null);
-        }catch (Exception e){
+        try {
+            setup();
+        }catch(Exception e){
             e.printStackTrace();
         }
     }

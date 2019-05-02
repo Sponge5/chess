@@ -6,6 +6,7 @@ client/Runner$3.class
 client/Runner$2.class
 Main.class
 client/GUI/MenuScreen$3.class
+logic/Board.class
 logic/PieceIF.class
 logic/PosXY.class
 logic/pieces/Queen.class
@@ -19,7 +20,6 @@ logic/pieces/Bishop.class
 client/communication/Utils.class
 logic/Piece.class
 client/GUI/BoardGUI.class
-server/Board.class
 client/GUI/MenuScreen$4.class
 logic/pieces/Rook.class
 client/GUI/MenuScreen.class
