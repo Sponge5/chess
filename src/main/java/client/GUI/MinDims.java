@@ -2,7 +2,7 @@ package client.GUI;
 
 public enum MinDims{
     BUTTON (40, 40),
-    SCENE (320, 320);
+    SCENE (400, 400);
 
     public int width, height;
 

@@ -44,8 +44,20 @@ public class Runner extends Application{
         }
         this.cliThread = new Thread(new Utils(this.port));
         this.cliThread.start();
-        this.logicThread = new Thread(new Board());
+        this.board = new Board();
+        this.logicThread = new Thread(this.board);
         this.logicThread.start();
+        while(true){
+            /*TODO 1. get move from gui
+              TODO 2. process it in board
+              TODO 3. send to server
+              TODO 4. wait for server response (move ok, not ok)
+              TODO 5. if move not ok -> 1.
+              TODO 6. wait for new state(move?) from server
+              TODO 7. update gui
+              TODO 8. 1.
+             */
+        }
     }
 
     public static void main(String[] args) throws Exception {
