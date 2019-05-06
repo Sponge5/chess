@@ -5,6 +5,7 @@ client/GUI/BoardGUI$1.class
 logic/pieces/King.class
 client/Runner$3.class
 client/Runner$2.class
+client/GUI/ChessSymbols.class
 Main.class
 client/GUI/MenuScreen$3.class
 logic/Board.class
@@ -23,6 +24,7 @@ logic/Piece.class
 client/GUI/BoardGUI.class
 client/GUI/MenuScreen$4.class
 logic/pieces/Rook.class
+logic/PlayerColor.class
 client/GUI/MenuScreen.class
 logic/Player.class
 client/Runner$1.class

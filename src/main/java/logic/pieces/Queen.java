@@ -1,10 +1,11 @@
 package logic.pieces;
 
 import logic.Piece;
+import logic.PlayerColor;
 import logic.PosXY;
 
 public class Queen extends Piece {
-    public Queen(Boolean color, Integer x, Integer y) {
+    public Queen(PlayerColor color, Integer x, Integer y) {
         super(color, x, y);
     }
 

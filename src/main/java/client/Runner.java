@@ -11,52 +11,24 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import logic.Board;
+import logic.PosXY;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-
 public class Runner extends Application{
-    private Integer port;
+    private int port;
     private MenuScreen ms;
     private BoardGUI boardGUI;
-    private Board board;
-    private Thread  logicThread,
-                    cliThread,
-                    servThread;
 
-    private void runGame(Stage stage, Boolean remote, Boolean computer){
+    private void runGame(Stage stage, Boolean remote, Boolean computer) {
         /* Garbage collector should clean ms */
         this.ms = null;
-        this.boardGUI = new BoardGUI(null);
+        this.boardGUI = new BoardGUI(null, new Board(),
+                new LinkedBlockingQueue<PosXY[]>(4));
         try {
-            this.boardGUI.start(stage);
+            this.boardGUI.start(stage, remote, computer, this.port);
         }catch (Exception e){
             e.printStackTrace();
-        }
-        if(!remote) {
-            /* queue for server port */
-            LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
-            /* run server */
-            server.Runner server = new server.Runner();
-            this.port = server.getPort();
-            this.servThread = new Thread(server);
-            this.servThread.start();
-        }
-        this.cliThread = new Thread(new Utils(this.port));
-        this.cliThread.start();
-        this.board = new Board();
-        this.logicThread = new Thread(this.board);
-        this.logicThread.start();
-        while(true){
-            /*TODO 1. get move from gui
-              TODO 2. process it in board
-              TODO 3. send to server
-              TODO 4. wait for server response (move ok, not ok)
-              TODO 5. if move not ok -> 1.
-              TODO 6. wait for new state(move?) from server
-              TODO 7. update gui
-              TODO 8. 1.
-             */
         }
     }
 
