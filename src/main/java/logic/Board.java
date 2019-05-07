@@ -23,15 +23,10 @@ public class Board {
         this.blackPlayer = new Player(PlayerColor.BLACK, this.state);
     }
 
-    public boolean isMoveLegal(boolean color, PosXY[] move){
-        if(color == PlayerColor.WHITE.color) {
-            //white player
-            return false;
-        }else{
-           //black player
-           return true;
-        }
-        //return false;
+    public Boolean isMoveLegal(PlayerColor color, PosXY[] move){
+        if(color.equals(PlayerColor.WHITE))
+            return this.whitePlayer.isMoveLegal(move);
+        return this.blackPlayer.isMoveLegal(move);
     }
     public Board(Integer[][] state){
         this.state = state;

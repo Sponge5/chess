@@ -9,6 +9,14 @@ public enum PlayerColor {
     PlayerColor(boolean color) {
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        if(this.color){
+            return new String("white");
+        }
+        return new String("black");
+    }
 }
 
 

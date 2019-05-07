@@ -2,7 +2,6 @@ package client;
 
 import client.GUI.BoardGUI;
 import client.GUI.MenuScreen;
-import client.communication.Utils;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

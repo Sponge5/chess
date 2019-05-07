@@ -9,11 +9,11 @@ public class Queen extends Piece {
         super(color, x, y);
     }
 
-    public Boolean move(PosXY to) {
-        return null;
+    public Integer[][] move(PosXY to, Integer[][] state) {
+        return new Integer[0][];
     }
 
-    public Boolean moveValid(PosXY to) {
+    public Boolean moveValid(PosXY to, Integer[][] state) {
         return null;
     }
 }

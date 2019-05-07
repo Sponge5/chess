@@ -1,6 +1,6 @@
 package logic;
 
 public interface PieceIF {
-    Boolean move(PosXY to);
-    Boolean moveValid(PosXY to);
+    Integer[][] move(PosXY to, Integer state[][]);
+    Boolean moveValid(PosXY to, Integer state[][]);
 }

@@ -8,7 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import logic.Board;
 import logic.PlayerColor;
@@ -28,22 +31,15 @@ public class BoardGUI {
     private Integer[][] state;
     private Button[][] buttons;
     private PosXY[] move;
-    private LinkedBlockingQueue<PosXY[]> moves;
     private PlayerColor color;
+    private Utils comm;
 
     public BoardGUI(Integer[][] state, Board board, LinkedBlockingQueue<PosXY[]> moves){
         if(state == null)
             this.state = board.getState();
         else
             this.state = state;
-        for (int i = 0; i < this.state.length; i++) {
-            for (int j = 0; j < this.state[i].length; j++) {
-                System.out.printf(this.state[i][j] + " ");
-            }
-            System.out.println();
-        }
         this.board = board;
-        this.moves = moves;
         this.move = new PosXY[2];
         this.move[0] = null;
         this.move[1] = null;
@@ -54,46 +50,23 @@ public class BoardGUI {
             }
         };
     }
-
-    public void runGame2Players() throws InterruptedException {
-        boolean whiteTurn = true;
-        /*TODO 1. get move from gui
-          TODO 2. process it in board
-          TODO 3. send to server
-          TODO 4. wait for server response (move ok, not ok)
-          TODO 5. if move not ok -> 1.
-          TODO 6. wait for new state(move?) from server
-          TODO 7. update gui
-          TODO 8. 1.
-         */
-        while(!this.board.isOver()){
-            System.out.println("we here");
-            PosXY move[] = this.moves.take();
-            if(!this.board.isMoveLegal(whiteTurn, move))
-                System.out.println("we here");
-        }
-    }
-
     public void setMove(MouseEvent mouseEvent){
-        if(move[0] != null && move[1] != null){
-            move[0] = null;
-            move[1] = null;
+        if(this.move[0] != null && this.move[1] != null){
+            this.move[0] = null;
+            this.move[1] = null;
         }
-        if (move[0] == null) {
-            move[0] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
+        if (this.move[0] == null) {
+            this.move[0] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
         }else{
-            move[1] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
-            //TODO test in board, if correct, move is stored in board
-            try {
-                moves.put(move);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            this.move[1] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
+            if(this.board.isMoveLegal(this.color, this.move)){
+                try {
+                    this.comm.getOutMove().put(this.move);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
-    }
-
-    public Integer[][] getState() {
-        return state;
     }
 
     public void start(Stage stage, Boolean remote, Boolean computer, int port) throws Exception {
@@ -110,6 +83,14 @@ public class BoardGUI {
                 button.setUserData(new PosXY(i, j));
                 button.setOnMouseClicked(this.gridButtonHandler);
                 button.setStyle("-fx-font: 18 arial;");
+                if((i+j) % 2 != 0)
+                    button.setBackground(new Background(
+                            new BackgroundFill(Paint.valueOf("grey"),
+                                    null, null)));
+                else
+                    button.setBackground(new Background(
+                            new BackgroundFill(Paint.valueOf("white"),
+                                    null, null)));
                 this.buttons[i][j] = button;
                 this.boardPane.add(buttons[i][j], j, i);
             }
@@ -141,18 +122,9 @@ public class BoardGUI {
             this.servThread = new Thread(server);
             this.servThread.start();
         }
-        this.cliThread = new Thread(new Utils(this.port));
+        this.comm = new Utils(this.port);
+        this.cliThread = new Thread(this.comm);
         this.cliThread.start();
-        //if(computer){
-        //    //TODO run game vs computer
-        //    //runGameVsComputer();
-        //}else if(remote){
-        //    //TODO run game vs player
-        //    //runGameVsPlayer();
-        //}else {
-        //    //two players 1 pc
-        //    runGame2Players();
-        //}
         updateGUI();
     }
 
@@ -206,7 +178,8 @@ public class BoardGUI {
     public Board getBoard(){
         return this.board;
     }
-    public LinkedBlockingQueue<PosXY[]> getMoves(){
-        return this.moves;
+    public Integer[][] getState() {
+        return state;
     }
+
 }
