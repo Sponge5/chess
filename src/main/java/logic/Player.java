@@ -4,6 +4,7 @@ import logic.pieces.*;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Player {
     private PlayerColor color;
@@ -11,6 +12,14 @@ public class Player {
     private Integer[][] state;
     private Time time;
 
+    /*TODO update piece upon move as well*/
+
+    /* random move */
+    public PosXY[] getComputerMove(){
+        Random rand = new Random();
+        Piece p = this.pieces.get(rand.nextInt(this.pieces.size()));
+        return p.getRandomMove();
+    }
     /* checks if move[] is legal for current state */
     public Boolean isMoveLegal(PosXY move[]){
         for (Piece p :

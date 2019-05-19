@@ -4,6 +4,8 @@ import logic.Piece;
 import logic.PlayerColor;
 import logic.PosXY;
 
+import java.util.ArrayList;
+
 public class Pawn extends Piece {
     public Pawn(PlayerColor color, Integer x, Integer y) {
         super(color, x, y);
@@ -39,5 +41,13 @@ public class Pawn extends Piece {
             return true;
         }
         return false;
+    }
+
+    public ArrayList<PosXY> getAllDestinations() {
+        return null;
+    }
+
+    public PosXY[] getRandomMove() {
+        return new PosXY[0];
     }
 }

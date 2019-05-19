@@ -4,6 +4,8 @@ import logic.Piece;
 import logic.PlayerColor;
 import logic.PosXY;
 
+import java.util.ArrayList;
+
 public class King extends Piece {
     public King(PlayerColor color, Integer x, Integer y) {
         super(color, x, y);
@@ -15,5 +17,13 @@ public class King extends Piece {
 
     public Boolean moveValid(PosXY to, Integer[][] state) {
         return null;
+    }
+
+    public ArrayList<PosXY> getAllDestinations() {
+        return null;
+    }
+
+    public PosXY[] getRandomMove() {
+        return new PosXY[0];
     }
 }

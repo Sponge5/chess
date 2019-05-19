@@ -1,5 +1,3 @@
-import java.util.concurrent.LinkedBlockingQueue;
-
 public class Main {
     public static void main(String[] args) throws Exception {
         if(args == null || args.length == 0){
@@ -14,7 +12,7 @@ public class Main {
             } else if (args[0].equals("server")) {
                 /* run server */
                 System.out.println("Running server");
-                server.Runner srv = new server.Runner();
+                server.Runner srv = new server.Runner(8888, true);
                 Integer port = srv.getPort();
                 System.out.println("server port: " + port.toString());
                 srv.run();

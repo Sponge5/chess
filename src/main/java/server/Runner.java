@@ -2,78 +2,69 @@ package server;
 
 import client.communication.Utils;
 import logic.Board;
+import logic.Player;
 import logic.PlayerColor;
 import logic.PosXY;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 public class Runner implements Runnable{
+    private Boolean twoClients;
     private ServerSocket serverSocket;
-    private Socket conSocket;
-    private BufferedReader inFromClient;
-    private DataOutputStream outToClient;
-    private PlayerColor color;
-    private PosXY move[];
-    private Board board;
+    private Connection firstCon, secondCon, connection;
 
-    public Runner(){
+    public Runner(Boolean remote){
+        this.twoClients = remote;
         try {
             this.serverSocket = new ServerSocket(8888);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
-    public int getPort(){
-        return this.serverSocket.getLocalPort();
-    }
-
-    private void setup() throws Exception{
-        /* communication */
-        this.conSocket = this.serverSocket.accept();
-        this.inFromClient = new BufferedReader(
-                new InputStreamReader(this.conSocket.getInputStream()));
-        this.outToClient = new DataOutputStream(
-                this.conSocket.getOutputStream());
-        /* logic */
-        //default board
-        this.board = new Board();
-        this.move = new PosXY[2];
-        this.color = PlayerColor.WHITE;
-    }
-
-    private void runGame() throws Exception{
-        while(true){
-            /* recv move
-             *TODO check validity
-             *TODO send confirmation
-             *TODO send move to other client (or back)
-             */
-            recvMove();
-            //this.outToClient.writeBytes(capitalizedSentence);
-        }
-    }
-    public void recvMove() throws Exception{
-        while(true) {
-            String moveString = this.inFromClient.readLine();
-            this.move = Utils.posFromString(moveString);
-            if(this.board.isMoveLegal(this.color, this.move)){
-                this.outToClient.writeBytes("ok\n");
-                break;
-            }
-            this.outToClient.writeBytes("nope\n");
-        }
-    }
-
-    public void run() {
+    public Runner(int port, Boolean remote){
+        this.twoClients = remote;
         try {
-            setup();
-            runGame();
+            this.serverSocket = new ServerSocket(port);
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    public void run() {
+        try {
+            if(this.twoClients){
+                this.firstCon = new Connection(this.serverSocket, twoClients,
+                        PlayerColor.WHITE);
+                this.secondCon = new Connection(this.serverSocket, twoClients,
+                        PlayerColor.BLACK);
+                this.firstCon.start();
+                this.secondCon.start();
+                twoPlayerGame();
+            }else{
+                this.connection = new Connection(this.serverSocket, !twoClients,
+                        PlayerColor.WHITE);
+                this.connection.run();
+            }
+            this.serverSocket.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public void twoPlayerGame() throws Exception{
+        while(true) {
+            PosXY[] move = this.firstCon.getInMove().take();
+            this.secondCon.getOutMove().put(move);
+            if(this.firstCon.getBoard().isOver())
+                break;
+            move = this.secondCon.getInMove().take();
+            this.firstCon.getOutMove().put(move);
+            if(this.secondCon.getBoard().isOver())
+                break;
+        }
+    }
+    public int getPort(){
+        return this.serverSocket.getLocalPort();
+    }
+    public String getAddress(){
+        return this.serverSocket.toString();
     }
 }

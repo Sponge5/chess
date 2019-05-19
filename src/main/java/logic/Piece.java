@@ -8,7 +8,6 @@ public abstract class Piece implements PieceIF{
         this.color = color;
         this.posXY = new PosXY(x,y);
     }
-
     public PlayerColor getColor() {
         return color;
     }

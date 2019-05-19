@@ -16,12 +16,41 @@ public class Utils implements Runnable{
     private LinkedBlockingQueue<PosXY[]> outMove;
     private LinkedBlockingQueue<PosXY[]> inMove;
     private LinkedBlockingQueue<Boolean> updateGUI;
+    private Boolean remote;
+    private Boolean computer;
 
+    public Utils(int port, Boolean remote, Boolean computer){
+        this.port = port;
+        this.remote = remote;
+        this.computer = computer;
+        this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
+        this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
+        this.updateGUI = new LinkedBlockingQueue<Boolean>(1);
+
+    }
+    public void run() {
+        try {
+            connect();
+            gameCommunication();
+            this.clientSocket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void connect() throws Exception {
+        this.clientSocket = new Socket("localhost", this.port);
+        this.outToServer = new DataOutputStream(
+                this.clientSocket.getOutputStream()
+        );
+        this.inFromServer = new BufferedReader(
+                new InputStreamReader(this.clientSocket.getInputStream())
+        );
+    }
     public void gameCommunication() throws Exception {
         while(true){
-            System.out.println("waiting for move from GUI...");
+            System.out.println("Client waiting for move from GUI...");
             sendMove();
-            System.out.println("waiting for move from server...");
+            System.out.println("Client waiting for move from server...");
             recvMove();
         }
     }
@@ -50,36 +79,13 @@ public class Utils implements Runnable{
         return move;
     }
 
-    public void connect() throws Exception {
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-
-        this.clientSocket = new Socket("localhost", this.port);
-        this.outToServer = new DataOutputStream(
-                this.clientSocket.getOutputStream()
-        );
-        this.inFromServer = new BufferedReader(
-                new InputStreamReader(this.clientSocket.getInputStream())
-        );
-    }
-    public void run() {
-        try {
-            connect();
-            gameCommunication();
-            this.clientSocket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public Utils(int port){
-        this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
-        this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
-        this.updateGUI = new LinkedBlockingQueue<Boolean>(1);
-        this.port = port;
-    }
     public LinkedBlockingQueue<PosXY[]> getOutMove() {
         return outMove;
     }
     public LinkedBlockingQueue<Boolean> getUpdateGUI() {
         return updateGUI;
+    }
+    public LinkedBlockingQueue<PosXY[]> getInMove() {
+        return inMove;
     }
 }

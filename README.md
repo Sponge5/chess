@@ -15,25 +15,24 @@ Client/server application using JavaFX
 
 ## Running
 
+Compile
 `
-	mvn clean compile
-`
-
-Running client
-
-`
-	mvn exec:java -Dexec.arguments=client
+	make
 `
 
-Running server for server testing
+Only client -> can only play local game
 
 `
-	mvn exec:java -Dexec.arguments=server
+	make client
 `
 
-Run client and select new game, that's all the functionality right now.
+Run server in order to play remote game
+
+`
+	make server
+`
 
 ## TODO
-* [ ] Client creates it's own thread for server in case of game on 1 machine
-* [ ] Gui in own thread
-* [ ] Add modifiers to class datastructures (for security)
+* [x] Client creates it's own thread for server in case of game on 1 machine
+* [x] Communication in own thread
+* [x] Add modifiers to class datastructures (for security)

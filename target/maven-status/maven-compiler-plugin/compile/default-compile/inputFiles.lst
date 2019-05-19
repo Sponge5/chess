@@ -1,5 +1,5 @@
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/Piece.java
-/home/adam_procio/School/PJV/prociada/src/main/java/client/GUI/BoardGUI.java
+/home/adam_procio/School/PJV/prociada/src/main/java/client/GUI/GameScreen.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/PieceIF.java
 /home/adam_procio/School/PJV/prociada/src/main/java/client/GUI/ChessSymbols.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/pieces/Bishop.java
@@ -11,7 +11,9 @@
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/PosXY.java
 /home/adam_procio/School/PJV/prociada/src/main/java/server/Runner.java
 /home/adam_procio/School/PJV/prociada/src/main/java/client/communication/Utils.java
+/home/adam_procio/School/PJV/prociada/src/main/java/client/GUI/BoardPane.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/pieces/Queen.java
+/home/adam_procio/School/PJV/prociada/src/main/java/server/Connection.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/pieces/Knight.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/pieces/Rook.java
 /home/adam_procio/School/PJV/prociada/src/main/java/Main.java
