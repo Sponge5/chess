@@ -12,7 +12,9 @@ public class Pawn extends Piece {
     }
 
     public Integer[][] move(PosXY to, Integer[][] state) {
-        return new Integer[0][];
+        state[to.getX()][to.getY()] = this.getColor().equals(PlayerColor.WHITE) ?
+                1 : -1;
+        return super.move(to, state);
     }
 
     public Boolean moveValid(PosXY to, Integer[][] state) {
@@ -44,10 +46,27 @@ public class Pawn extends Piece {
     }
 
     public ArrayList<PosXY> getAllDestinations() {
-        return null;
-    }
-
-    public PosXY[] getRandomMove() {
-        return new PosXY[0];
+        ArrayList<PosXY> ret = new ArrayList<PosXY>();
+        int x = this.getX();
+        int y = this.getY();
+        if(x+1 <= 7) {
+            ret.add(new PosXY(x + 1, y));
+            if(y-1 >= 0)
+                ret.add(new PosXY(x+1, y-1));
+            if(y+1 <= 7)
+                ret.add(new PosXY(x+1, y+1));
+        }
+        if(x+2 <= 7)
+            ret.add(new PosXY(x+2, y));
+        if(x-1 >= 0){
+            ret.add(new PosXY(x-1, y));
+            if(y-1 >= 0)
+                ret.add(new PosXY(x-1, y-1));
+            if(y+1 <= 7)
+                ret.add(new PosXY(x-1, y+1));
+        }
+        if(x-2 >= 0)
+            ret.add(new PosXY(x-2, y));
+        return ret;
     }
 }

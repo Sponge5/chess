@@ -1,5 +1,6 @@
 package client.communication;
 
+import logic.PlayerColor;
 import logic.PosXY;
 
 import java.io.BufferedReader;
@@ -8,7 +9,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Utils implements Runnable{
+public class ClientCommunication implements Runnable{
     private int port;
     private Socket clientSocket;
     private BufferedReader inFromServer;
@@ -17,12 +18,12 @@ public class Utils implements Runnable{
     private LinkedBlockingQueue<PosXY[]> inMove;
     private LinkedBlockingQueue<Boolean> updateGUI;
     private Boolean remote;
-    private Boolean computer;
+    private PlayerColor color;
 
-    public Utils(int port, Boolean remote, Boolean computer){
+    public ClientCommunication(int port, Boolean remote, PlayerColor color){
         this.port = port;
         this.remote = remote;
-        this.computer = computer;
+        this.color = color;
         this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
         this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
         this.updateGUI = new LinkedBlockingQueue<Boolean>(1);
@@ -31,12 +32,20 @@ public class Utils implements Runnable{
     public void run() {
         try {
             connect();
-            gameCommunication();
+            if(this.remote)
+                remoteGame();
+            else
+                localGame();
             this.clientSocket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * connect to server and setup stream communication
+     * @throws Exception
+     */
     public void connect() throws Exception {
         this.clientSocket = new Socket("localhost", this.port);
         this.outToServer = new DataOutputStream(
@@ -46,7 +55,16 @@ public class Utils implements Runnable{
                 new InputStreamReader(this.clientSocket.getInputStream())
         );
     }
-    public void gameCommunication() throws Exception {
+
+    /**
+     * sending move and receiving move from server
+     * @throws Exception
+     */
+    public void remoteGame() throws Exception {
+        if(this.color.equals(PlayerColor.BLACK)) {
+            System.out.println("Client waiting for move from server...");
+            recvMove();
+        }
         while(true){
             System.out.println("Client waiting for move from GUI...");
             sendMove();
@@ -54,9 +72,21 @@ public class Utils implements Runnable{
             recvMove();
         }
     }
+
+    public void localGame() throws Exception{
+        while(true){
+            System.out.println("Client waiting for move from GUI...");
+            sendMove();
+        }
+    }
+
+    /**
+     * keeps sending moves until one is accepted
+     * @throws Exception
+     */
     public void sendMove() throws Exception{
         while(true) {
-            //move is valid according to board logic
+            /* move is valid according to board logic */
             PosXY move[] = this.outMove.take();
             this.outToServer.writeBytes(move[0].toString() + " " + move[1].toString() + "\n");
             String response = this.inFromServer.readLine();
@@ -81,9 +111,6 @@ public class Utils implements Runnable{
 
     public LinkedBlockingQueue<PosXY[]> getOutMove() {
         return outMove;
-    }
-    public LinkedBlockingQueue<Boolean> getUpdateGUI() {
-        return updateGUI;
     }
     public LinkedBlockingQueue<PosXY[]> getInMove() {
         return inMove;

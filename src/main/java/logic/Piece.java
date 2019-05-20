@@ -1,5 +1,8 @@
 package logic;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public abstract class Piece implements PieceIF{
     private PlayerColor color;
     private PosXY posXY;
@@ -8,6 +11,25 @@ public abstract class Piece implements PieceIF{
         this.color = color;
         this.posXY = new PosXY(x,y);
     }
+
+    public Integer[][] move(PosXY to, Integer[][] state) {
+        state[this.getX()][this.getY()] = 0;
+        return state;
+    }
+
+    public PosXY[] getRandomMove(Integer[][] state) {
+        PosXY[] ret = new PosXY[2];
+        ret[0] = this.getPosXY();
+        ArrayList<PosXY> dests = this.getAllDestinations();
+        Random rand = new Random();
+        do {
+            ret[1] = dests.remove(rand.nextInt(dests.size()));
+            if(ret[1] == null)
+                return null;
+        }while(!this.moveValid(ret[1], state));
+        return ret;
+    }
+
     public PlayerColor getColor() {
         return color;
     }

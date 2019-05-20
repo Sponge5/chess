@@ -12,18 +12,57 @@ public class Rook extends Piece {
     }
 
     public Integer[][] move(PosXY to, Integer[][] state) {
-        return new Integer[0][];
+        state[to.getX()][to.getY()] = this.getColor().equals(PlayerColor.WHITE) ?
+                4 : -4;
+        return super.move(to, state);
     }
 
     public Boolean moveValid(PosXY to, Integer[][] state) {
-        return null;
+        if(!this.getAllDestinations().contains(to))
+            return false;
+        if(state[to.getX()][to.getY()] > 0 && this.getColor().equals(PlayerColor.WHITE))
+            return false;
+        else if(state[to.getX()][to.getY()] < 0 && this.getColor().equals(PlayerColor.BLACK))
+            return false;
+        int x = this.getX();
+        int y = this.getY();
+        if(x == to.getX()){
+            while(true){
+                if(y < to.getY())
+                    ++y;
+                else
+                    --y;
+                if(y == to.getY())
+                    return true;
+                if(!state[x][y].equals(0))
+                    return false;
+            }
+        }else if(y == to.getY()){
+            while(true){
+                if(x < to.getX())
+                    ++x;
+                else
+                    --x;
+                if(x == to.getX())
+                    return true;
+                if(!state[x][y].equals(0))
+                    return false;
+            }
+        }
+        return false;
     }
 
     public ArrayList<PosXY> getAllDestinations() {
-        return null;
-    }
-
-    public PosXY[] getRandomMove() {
-        return new PosXY[0];
+        ArrayList<PosXY> ret = new ArrayList<PosXY>();
+        int x = this.getX();
+        int y = this.getY();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if(x == i || y == j){
+                    ret.add(new PosXY(i, j));
+                }
+            }
+        }
+        return ret;
     }
 }

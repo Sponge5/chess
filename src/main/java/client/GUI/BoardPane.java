@@ -22,8 +22,6 @@ public class BoardPane extends GridPane {
     private PosXY[] move;
     private PlayerColor playerColor;
     private LinkedBlockingQueue<Boolean> outMoveReady;
-    private LinkedBlockingQueue<Boolean> outMoveOkay;
-    private LinkedBlockingQueue<Boolean> inMoveReady;
 
     /*TODO flip board based on color */
     public BoardPane(Integer[][] state, PlayerColor color){
@@ -71,8 +69,6 @@ public class BoardPane extends GridPane {
             c++;
         }
         this.outMoveReady = new LinkedBlockingQueue<Boolean>(1);
-        this.outMoveOkay = new LinkedBlockingQueue<Boolean>(1);
-        this.inMoveReady = new LinkedBlockingQueue<Boolean>(1);
     }
 
     /**
@@ -80,7 +76,6 @@ public class BoardPane extends GridPane {
      * @param mouseEvent
      */
     public void setMove(MouseEvent mouseEvent){
-        System.out.println("setMove()");
         if(this.move[0] != null && this.move[1] != null){
             this.move[0] = null;
             this.move[1] = null;
@@ -89,7 +84,7 @@ public class BoardPane extends GridPane {
             this.move[0] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
         }else{
             this.move[1] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
-            /* get move out to GameScreen */
+            /* get move out to Runner */
             try {
                 this.outMoveReady.put(true);
             }catch (Exception e){
@@ -104,7 +99,6 @@ public class BoardPane extends GridPane {
                 y1 = this.move[0].getY(),
                 y2 = this.move[1].getY();
         String pieceTxt = this.squareButtons[x1][y1].getText();
-        System.out.println("we here");
         for (Node node :
                 this.getChildren()) {
             if (GridPane.getRowIndex(node).equals(x1) && GridPane.getColumnIndex(node).equals(y1))
@@ -112,12 +106,6 @@ public class BoardPane extends GridPane {
             if (GridPane.getRowIndex(node).equals(x2) && GridPane.getColumnIndex(node).equals(y2))
                 ((Button) node).setText(pieceTxt);
         }
-//        this.buttons[x1][y1].setText("");
-//        this.buttons[x2][y2].setText(pieceTxt);
-//        this.boardPane.getChildren().remove(y1, x1);
-//        this.boardPane.getChildren().remove(y2, x2);
-//        this.boardPane.add(this.buttons[x1][y1], y1, x1);
-//        this.boardPane.add(this.buttons[x2][y2], y2, x2);
     }
     public void setButtons(){
         for (int i = 0; i < this.state.length; i++) {
@@ -168,12 +156,6 @@ public class BoardPane extends GridPane {
     }
     public LinkedBlockingQueue<Boolean> getOutMoveReady() {
         return outMoveReady;
-    }
-    public LinkedBlockingQueue<Boolean> getOutMoveOkay() {
-        return outMoveOkay;
-    }
-    public LinkedBlockingQueue<Boolean> getInMoveReady() {
-        return inMoveReady;
     }
     public PosXY[] getMove() {
         return move;

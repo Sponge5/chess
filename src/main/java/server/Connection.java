@@ -1,6 +1,6 @@
 package server;
 
-import client.communication.Utils;
+import client.communication.ClientCommunication;
 import logic.Board;
 import logic.PlayerColor;
 import logic.PosXY;
@@ -10,20 +10,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Connection extends Thread {
+public class Connection extends Thread{
     private ServerSocket serverSocket;
     private BufferedReader inFromClient;
     private DataOutputStream outToClient;
     private Socket conSocket;
-    private LinkedBlockingQueue<PosXY[]> inMove, outMove;
     private Boolean twoClients;
+    private LinkedBlockingQueue<PosXY[]> inMove, outMove;
     private Board board;
     private PlayerColor color;
 
     public Connection(ServerSocket serverSocket, Boolean twoClients, PlayerColor color) {
-        this.board = new Board();
         this.serverSocket = serverSocket;
         this.twoClients = twoClients;
+        this.board = new Board();
         this.color = color;
         this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
         this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
@@ -59,7 +59,7 @@ public class Connection extends Thread {
         PosXY[] move;
         while (true) {
             String moveString = this.inFromClient.readLine();
-            move = Utils.posFromString(moveString);
+            move = ClientCommunication.posFromString(moveString);
             if (this.board.isMoveLegal(this.color, move)) {
                 this.outToClient.writeBytes("ok\n");
                 break;

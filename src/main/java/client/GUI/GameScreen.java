@@ -28,5 +28,4 @@ public class GameScreen {
     public BoardPane getBoardPane() {
         return boardPane;
     }
-
 }

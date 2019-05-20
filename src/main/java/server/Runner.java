@@ -1,8 +1,6 @@
 package server;
 
-import client.communication.Utils;
 import logic.Board;
-import logic.Player;
 import logic.PlayerColor;
 import logic.PosXY;
 
@@ -12,11 +10,12 @@ public class Runner implements Runnable{
     private Boolean twoClients;
     private ServerSocket serverSocket;
     private Connection firstCon, secondCon, connection;
+    private int defaultPort = 8888;
 
     public Runner(Boolean remote){
         this.twoClients = remote;
         try {
-            this.serverSocket = new ServerSocket(8888);
+            this.serverSocket = new ServerSocket(this.defaultPort);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -65,6 +64,6 @@ public class Runner implements Runnable{
         return this.serverSocket.getLocalPort();
     }
     public String getAddress(){
-        return this.serverSocket.toString();
+        return this.serverSocket.getLocalSocketAddress().toString();
     }
 }

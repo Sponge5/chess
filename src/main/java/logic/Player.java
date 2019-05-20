@@ -16,9 +16,13 @@ public class Player {
 
     /* random move */
     public PosXY[] getComputerMove(){
-        Random rand = new Random();
-        Piece p = this.pieces.get(rand.nextInt(this.pieces.size()));
-        return p.getRandomMove();
+        PosXY[] ret;
+        do {
+            Random rand = new Random();
+            Piece p = this.pieces.get(rand.nextInt(this.pieces.size()));
+            ret = p.getRandomMove(this.state);
+        }while(ret == null);
+        return ret;
     }
     /* checks if move[] is legal for current state */
     public Boolean isMoveLegal(PosXY move[]){

@@ -17,7 +17,7 @@ public class Board {
                 { 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0},
                 { 1, 1, 1, 1, 1, 1, 1, 1},
-                { 4, 2, 3, 6, 5, 3, 2, 4}
+                { 4, 2, 3, 5, 6, 3, 2, 4}
         };
         this.whitePlayer = new Player(PlayerColor.WHITE, this.state);
         this.blackPlayer = new Player(PlayerColor.BLACK, this.state);
@@ -30,6 +30,9 @@ public class Board {
                 this.whitePlayer.getComputerMove():
                 this.blackPlayer.getComputerMove();
     }
+    /*TODO check if position is attacked in board for King*/
+    /*TODO en passant */
+    /*TODO castling */
     public Boolean isMoveLegal(PlayerColor color, PosXY[] move){
         if(color.equals(PlayerColor.WHITE))
             return this.whitePlayer.isMoveLegal(move);
