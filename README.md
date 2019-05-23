@@ -31,6 +31,10 @@ Run server in order to play remote game
 `
 	make server
 `
+Testing
+`
+	make test
+`
 
 ## TODO
 * [x] Client creates it's own thread for server in case of game on 1 machine

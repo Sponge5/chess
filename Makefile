@@ -6,3 +6,6 @@ client:
 
 server:
 	mvn exec:java -Dexec.arguments=server
+
+test:
+	mvn test

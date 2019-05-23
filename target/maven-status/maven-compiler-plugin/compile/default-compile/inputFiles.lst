@@ -3,6 +3,7 @@
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/PieceIF.java
 /home/adam_procio/School/PJV/prociada/src/main/java/client/GUI/ChessSymbols.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/pieces/Bishop.java
+/home/adam_procio/School/PJV/prociada/src/main/java/logic/PieceValue.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/pieces/Pawn.java
 /home/adam_procio/School/PJV/prociada/src/main/java/logic/PlayerColor.java
 /home/adam_procio/School/PJV/prociada/src/main/java/client/GUI/MinDims.java

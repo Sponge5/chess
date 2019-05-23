@@ -18,7 +18,8 @@ public enum PlayerColor {
         return new String("black");
     }
     public PlayerColor otherColor(){
-        return this.equals(PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
+        return this.equals(PlayerColor.WHITE) ?
+                PlayerColor.BLACK : PlayerColor.WHITE;
     }
 }
 
