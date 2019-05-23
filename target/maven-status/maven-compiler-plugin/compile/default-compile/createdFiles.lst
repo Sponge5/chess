@@ -1,9 +1,6 @@
 client/GUI/BoardPane$1.class
-client/Runner$5.class
-client/GUI/MenuScreen$2.class
 server/Connection.class
 logic/PieceValue.class
-client/GUI/MenuScreen$5.class
 logic/pieces/King.class
 client/Runner$3.class
 client/Runner$2.class
@@ -11,7 +8,6 @@ client/GUI/ChessSymbols.class
 Main.class
 client/GUI/BoardPane.class
 logic/PieceValue$1.class
-client/GUI/MenuScreen$3.class
 logic/Board.class
 logic/PieceIF.class
 logic/PosXY.class
@@ -19,16 +15,11 @@ logic/pieces/Queen.class
 logic/pieces/Pawn.class
 logic/pieces/Knight.class
 client/communication/ClientCommunication.class
-client/Runner$6.class
 server/Runner.class
-client/Runner$4.class
-client/GUI/MenuScreen$6.class
 client/GUI/MinDims.class
-client/GUI/MenuScreen$1.class
 logic/pieces/Bishop.class
 client/GUI/GameScreen.class
 logic/Piece.class
-client/GUI/MenuScreen$4.class
 logic/pieces/Rook.class
 logic/PlayerColor.class
 client/GUI/MenuScreen.class

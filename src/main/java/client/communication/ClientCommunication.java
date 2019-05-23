@@ -10,7 +10,8 @@ import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientCommunication implements Runnable{
-    private int port;
+    private String address;
+    private Integer port;
     private Socket clientSocket;
     private BufferedReader inFromServer;
     private DataOutputStream outToServer;
@@ -20,7 +21,8 @@ public class ClientCommunication implements Runnable{
     private Boolean remote;
     private PlayerColor color;
 
-    public ClientCommunication(int port, Boolean remote, PlayerColor color){
+    public ClientCommunication(String address, Integer port, Boolean remote, PlayerColor color){
+        this.address = address;
         this.port = port;
         this.remote = remote;
         this.color = color;
@@ -47,7 +49,15 @@ public class ClientCommunication implements Runnable{
      * @throws Exception
      */
     public void connect() throws Exception {
-        this.clientSocket = new Socket("localhost", this.port);
+        if(!(this.address == null)){
+            try{
+                this.clientSocket = new Socket(this.address, this.port);
+            }catch (Exception e){
+                System.out.println("[ClientCommunication] Socket() threw exception");
+                this.clientSocket = new Socket("localhost", this.port);
+            }
+        }else
+            this.clientSocket = new Socket("localhost", this.port);
         this.outToServer = new DataOutputStream(
                 this.clientSocket.getOutputStream()
         );

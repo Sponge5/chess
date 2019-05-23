@@ -15,12 +15,14 @@ public class MenuScreen{
     private Scene scene;
     private Text titleText;
     private GridPane pane;
-    /* button4 is reserved for "back to main menu" */
-    private Button  mainMenuBtn,
-                    vsComputerBtn,
-                    twoPlayerBtn;
-    private TextField tf;
-    private EventHandler<ActionEvent> eh;
+    private Button mainMenuBtn;
+    private Button vsComputerBtn;
+    private Button twoPlayerBtn;
+    private Button connectAndPlayBtn;
+    private TextField portTextField;
+    private TextField addressTextField;
+    private EventHandler<ActionEvent> portTFEventHandler;
+    private EventHandler<ActionEvent> addressTFEventHandler;
 
     public void mainMenu(Stage stage){
         this.pane = new GridPane();
@@ -47,46 +49,34 @@ public class MenuScreen{
     private EventHandler<MouseEvent> newHandler(int i, final Stage stage){
         switch(i){
             case 0:
-                return new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent mouseEvent) {
+                return (MouseEvent) -> {
                         System.out.println("[MenuScreen] BackToMainMenu Button clicked");
                         mainMenu(stage);
-                    }
                 };
             case 1:
-                return new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent mouseEvent) {
+                return (MouseEvent) -> {
                         System.out.println("[MenuScreen] NewGame Button clicked");
                         newGameMenu(stage);
-                    }
                 };
             case 2:
-                return new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent mouseEvent) {
+                return (MouseEvent) -> {
                         System.out.println("[MenuScreen] LoadGame Button clicked");
                         loadGameMenu(stage);
-                    }
                 };
             case 3:
-                return new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent mouseEvent) {
+                return (MouseEvent) -> {
                         System.out.println("[MenuScreen] WatchGame Button clicked");
                         watchGameMenu(stage);
-                    }
                 };
             case 4:
-                return new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent mouseEvent) {
+                return (MouseEvent) -> {
                         System.out.println("[MenuScreen] LocalGame Button clicked");
                         localGameMenu(stage);
-                    }
                 };
             case 5:
-                return new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent mouseEvent) {
+                return (MouseEvent) -> {
                         System.out.println("[MenuScreen] RemoteGame Button clicked");
                         remoteGameMenu(stage);
-                    }
                 };
             default:
                 return null;
@@ -145,12 +135,14 @@ public class MenuScreen{
         stage.setScene(this.scene);
     }
 
-    private void remoteGameMenu(final Stage stage){
+    public void remoteGameMenu(final Stage stage){
         this.pane = new GridPane();
         this.pane.setAlignment(Pos.CENTER);
         this.pane.setVgap(5);
-        this.pane.add(this.tf, 0, 0);
-        this.pane.add(this.mainMenuBtn, 0, 1);
+        this.pane.add(this.addressTextField, 0, 0);
+        this.pane.add(this.portTextField, 0, 1);
+        this.pane.add(this.connectAndPlayBtn, 0, 2);
+        this.pane.add(this.mainMenuBtn, 0, 3);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
     }
@@ -161,20 +153,35 @@ public class MenuScreen{
     public Button getTwoPlayerBtn(){
         return this.twoPlayerBtn;
     }
-    public GridPane getPane(){
-        return this.pane;
+    public TextField getPortTextField(){
+        return this.portTextField;
     }
-    public TextField getTf(){
-        return this.tf;
+    public void setPortTextField(TextField portTextField){
+        this.portTextField = portTextField;
     }
-    public void setTf(TextField tf){
-        this.tf = tf;
+    public TextField getAddressTextField() {
+        return addressTextField;
     }
-    public EventHandler<ActionEvent> getEh(){
-        return this.eh;
+    public void setAddressTextField(TextField addressTextField) {
+        this.addressTextField = addressTextField;
     }
-    public void setEh(EventHandler<ActionEvent> eh){
-        this.eh = eh;
+    public Button getConnectAndPlayBtn() {
+        return connectAndPlayBtn;
+    }
+    public EventHandler<ActionEvent> getPortTFEventHandler() {
+        return portTFEventHandler;
+    }
+    public void setPortTFEventHandler(EventHandler<ActionEvent> portTFEventHandler) {
+        this.portTFEventHandler = portTFEventHandler;
+    }
+    public EventHandler<ActionEvent> getAddressTFEventHandler() {
+        return addressTFEventHandler;
+    }
+    public void setAddressTFEventHandler(EventHandler<ActionEvent> addressTFEventHandler) {
+        this.addressTFEventHandler = addressTFEventHandler;
+    }
+    public void setConnectAndPlayBtn(Button connectAndPlayBtn) {
+        this.connectAndPlayBtn = connectAndPlayBtn;
     }
     public void setVsComputerBtn(Button vsComputerBtn) {
         this.vsComputerBtn = vsComputerBtn;
