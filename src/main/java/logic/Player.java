@@ -17,11 +17,9 @@ public class Player {
         Random rand = new Random();
         ArrayList<Piece> tempPieces = new ArrayList<Piece>(this.pieces);
         while(ret == null && !tempPieces.isEmpty()) {
+            System.out.println("[Player] tempPieces.size() = " + tempPieces.size());
             Piece p = tempPieces.remove(rand.nextInt(tempPieces.size()));
-            System.out.println("[Player] random piece:\n" + p.toString());
             ret = p.getRandomMove(state);
-            if (ret != null)
-                System.out.println("[Player] random move:\n" + ret[0].toString() + " " + ret[1].toString());
         }
         return ret;
     }
@@ -45,7 +43,12 @@ public class Player {
     public Integer[][] move(Piece p, PosXY to, Integer[][] state) {
         return p.move(to, state);
     }
-
+    public void enemyMove(PosXY to){
+        Piece p = getPiece(to);
+        if(p != null){
+            this.pieces.remove(p);
+        }
+    }
     public Player(PlayerColor color, Integer[][] state){
         this.color = color;
         this.pieces = new ArrayList<Piece>();

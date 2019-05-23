@@ -19,34 +19,45 @@ public class Pawn extends Piece {
 
     public Boolean moveValid(PosXY to, Integer[][] state) {
         if(this.getY().equals(to.getY())){
+            /* straight move */
             if(state[to.getX()][to.getY()] != 0)
                 return false;
             if(this.getColor().equals(PlayerColor.WHITE)) {
                 if (this.getX().equals(to.getX()+1)){
                     //basic move
                     return true;
-                }else if(this.getX().equals(to.getX()+2) && this.getX().equals(6)){
+                }else if(this.getX().equals(6) && to.getX().equals(4)){
                     //double move
-                    return true;
+                    if(state[5][to.getY()].equals(0))
+                        return true;
                 }
             }else{
                 if(this.getX().equals(to.getX()-1)){
                     //basic black move
                     return true;
-                }else if(this.getX().equals(to.getX()-2) && this.getX().equals(1)){
+                }else if(this.getX().equals(1) && to.getX().equals(3)){
                     //double black move
-                    return true;
+                    if(state[2][to.getY()].equals(0))
+                        return true;
                 }
             }
-        }else if(this.getX().equals(to.getX()-1)
-                && (this.getY().equals(to.getY()+1)
-                || this.getY().equals(to.getY()-1))){
-            if(state[to.getX()][to.getY()] >= 0 && this.getColor().equals(PlayerColor.WHITE))
-                return false;
-            if(state[to.getX()][to.getY()] <= 0 && this.getColor().equals(PlayerColor.BLACK))
-                return false;
-            //take
-            return true;
+        }else{
+            /* take move */
+            if (this.getColor().equals(PlayerColor.WHITE)) {
+                if(this.getX().equals(to.getX()+1) &&
+                        (this.getY().equals(to.getY()-1) ||
+                                this.getY().equals(to.getY()+1))) {
+                    if (state[to.getX()][to.getY()] < 0)
+                        return true;
+                }
+            } else {
+                if(this.getX().equals(to.getX()-1) &&
+                        (this.getY().equals(to.getY()-1) ||
+                                this.getY().equals(to.getY()+1))) {
+                    if (state[to.getX()][to.getY()] > 0)
+                        return true;
+                }
+            }
         }
         return false;
     }

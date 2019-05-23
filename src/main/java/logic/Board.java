@@ -27,11 +27,11 @@ public class Board {
         this.state = state;
     }
     public PosXY[] getComputerMove(PlayerColor color){
-        System.out.println("[Board] state:\n" + this.toString());
         return color.equals(PlayerColor.WHITE) ?
                 this.whitePlayer.getComputerMove(this.state):
                 this.blackPlayer.getComputerMove(this.state);
     }
+    /*TODO change pawn on last square */
     /*TODO check if position is attacked in board for King*/
     /*TODO en passant */
     /*TODO castling */
@@ -63,9 +63,12 @@ public class Board {
         return this.isOver;
     }
     public void move(PlayerColor color, PosXY[] move){
-        if(color.equals(PlayerColor.WHITE))
+        if(color.equals(PlayerColor.WHITE)) {
             this.state = whitePlayer.move(move[0], move[1], this.state);
-        else
+            this.blackPlayer.enemyMove(move[1]);
+        }else {
             this.state = blackPlayer.move(move[0], move[1], this.state);
+            this.whitePlayer.enemyMove(move[1]);
+        }
     }
 }

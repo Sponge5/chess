@@ -20,14 +20,12 @@ public class Rook extends Piece {
     public Boolean moveValid(PosXY to, Integer[][] state) {
         if(!this.getAllDestinations().contains(to))
             return false;
-        if(state[to.getX()][to.getY()] > 0 && this.getColor().equals(PlayerColor.WHITE))
-            return false;
-        else if(state[to.getX()][to.getY()] < 0 && this.getColor().equals(PlayerColor.BLACK))
+        if(this.squareOccupied(to, state))
             return false;
         int x = this.getX();
         int y = this.getY();
         if(x == to.getX()){
-            while(true){
+            while(y != to.getY()){
                 if(y < to.getY())
                     ++y;
                 else
@@ -38,7 +36,7 @@ public class Rook extends Piece {
                     return false;
             }
         }else if(y == to.getY()){
-            while(true){
+            while(x != to.getX()){
                 if(x < to.getX())
                     ++x;
                 else

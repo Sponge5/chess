@@ -21,9 +21,7 @@ public class Bishop extends Piece {
     public Boolean moveValid(PosXY to, Integer[][] state) {
         if(!this.getAllDestinations().contains(to))
             return false;
-        if(state[to.getX()][to.getY()] > 0 && this.getColor().equals(PlayerColor.WHITE))
-            return false;
-        else if(state[to.getX()][to.getY()] < 0 && this.getColor().equals(PlayerColor.BLACK))
+        if(this.squareOccupied(to, state))
             return false;
         int x = this.getX();
         int y = this.getY();
@@ -36,7 +34,7 @@ public class Bishop extends Piece {
                 y--;
             else
                 y++;
-            if(this.getPosXY().equals(to))
+            if(to.getX() == x && to.getY() == y)
                 return true;
             if(!state[x][y].equals(0))
                 return false;
@@ -58,6 +56,7 @@ public class Bishop extends Piece {
             if(x+i <= 7 && y+i <= 7)
                 ret.add(new PosXY(x+i, y+i));
         }
+        System.out.println(ret.toString());
         return ret;
     }
 

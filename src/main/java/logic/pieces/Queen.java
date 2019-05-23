@@ -20,14 +20,13 @@ public class Queen extends Piece {
     public Boolean moveValid(PosXY to, Integer[][] state) {
         if(!this.getAllDestinations().contains(to))
             return false;
-        if(state[to.getX()][to.getY()] > 0 && this.getColor().equals(PlayerColor.WHITE))
-            return false;
-        else if(state[to.getX()][to.getY()] < 0 && this.getColor().equals(PlayerColor.BLACK))
+        if(this.squareOccupied(to, state))
             return false;
         int x = this.getX();
         int y = this.getY();
         if(x == to.getX()){
-            while(true){
+            /* straight move along X axis */
+            while(y != to.getY()){
                 if(y < to.getY())
                     ++y;
                 else
@@ -38,7 +37,8 @@ public class Queen extends Piece {
                     return false;
             }
         }else if(y == to.getY()){
-            while(true){
+            /* straight move along Y axis */
+            while(x != to.getX()){
                 if(x < to.getX())
                     ++x;
                 else
@@ -48,20 +48,23 @@ public class Queen extends Piece {
                 if(!state[x][y].equals(0))
                     return false;
             }
-        }
-        for (int i = 1; i < 7; i++) {
-            if(to.getX() < x)
-                x--;
-            else
-                x++;
-            if(to.getY() < y)
-                y--;
-            else
-                y++;
-            if(this.getPosXY().equals(to))
-                return true;
-            if(!state[x][y].equals(0))
-                return false;
+            return false;
+        }else {
+            /* diagonal move */
+            for (int i = 1; i < 7; i++) {
+                if (to.getX() < x)
+                    x--;
+                else
+                    x++;
+                if (to.getY() < y)
+                    y--;
+                else
+                    y++;
+                if (to.getX() == x && to.getY() == y)
+                    return true;
+                if (!state[x][y].equals(0))
+                    return false;
+            }
         }
         return false;
     }

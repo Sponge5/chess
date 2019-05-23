@@ -31,6 +31,19 @@ public abstract class Piece implements PieceIF{
         return null;
     }
 
+    /**
+     * @return true if square contains piece of same color as this
+     */
+    public Boolean squareOccupied(PosXY to, Integer[][] state){
+        if(this.getColor().equals(PlayerColor.WHITE)){
+            if(state[to.getX()][to.getY()] > 0)
+                return true;
+        }else{
+            if(state[to.getX()][to.getY()] < 0)
+                return true;
+        }
+        return false;
+    }
     public PlayerColor getColor() {
         return color;
     }
@@ -43,19 +56,9 @@ public abstract class Piece implements PieceIF{
     public Integer getY(){
         return this.posXY.getY();
     }
-    public void setPosXY(PosXY posXY) {
-        this.posXY = posXY;
-    }
     public PosXY getPosXY() {
         return posXY;
     }
-    public void setX(Integer x){
-        this.posXY.setX(x);
-    }
-    public void setY(Integer y){
-        this.posXY.setY(y);
-    }
-
     @Override
     public String toString() {
         return  this.posXY.toString() + " " + this.color.toString();
