@@ -49,42 +49,42 @@ public class MenuScreen{
             case 0:
                 return new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent mouseEvent) {
-                        System.out.println("BackToMainMenu Button clicked");
+                        System.out.println("[MenuScreen] BackToMainMenu Button clicked");
                         mainMenu(stage);
                     }
                 };
             case 1:
                 return new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent mouseEvent) {
-                        System.out.println("NewGame Button clicked");
+                        System.out.println("[MenuScreen] NewGame Button clicked");
                         newGameMenu(stage);
                     }
                 };
             case 2:
                 return new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent mouseEvent) {
-                        System.out.println("LoadGame Button clicked");
+                        System.out.println("[MenuScreen] LoadGame Button clicked");
                         loadGameMenu(stage);
                     }
                 };
             case 3:
                 return new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent mouseEvent) {
-                        System.out.println("WatchGame Button clicked");
+                        System.out.println("[MenuScreen] WatchGame Button clicked");
                         watchGameMenu(stage);
                     }
                 };
             case 4:
                 return new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent mouseEvent) {
-                        System.out.println("LocalGame Button clicked");
+                        System.out.println("[MenuScreen] LocalGame Button clicked");
                         localGameMenu(stage);
                     }
                 };
             case 5:
                 return new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent mouseEvent) {
-                        System.out.println("RemoteGame Button clicked");
+                        System.out.println("[MenuScreen] RemoteGame Button clicked");
                         remoteGameMenu(stage);
                     }
                 };

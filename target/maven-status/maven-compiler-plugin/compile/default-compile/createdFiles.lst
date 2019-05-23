@@ -17,9 +17,9 @@ logic/pieces/Queen.class
 logic/pieces/Pawn.class
 logic/pieces/Knight.class
 client/communication/ClientCommunication.class
+client/Runner$6.class
 server/Runner.class
 client/Runner$4.class
-client/Runner$4$1.class
 client/GUI/MenuScreen$6.class
 client/GUI/MinDims.class
 client/GUI/MenuScreen$1.class

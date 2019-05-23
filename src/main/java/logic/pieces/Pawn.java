@@ -19,6 +19,8 @@ public class Pawn extends Piece {
 
     public Boolean moveValid(PosXY to, Integer[][] state) {
         if(this.getY().equals(to.getY())){
+            if(state[to.getX()][to.getY()] != 0)
+                return false;
             if(this.getColor().equals(PlayerColor.WHITE)) {
                 if (this.getX().equals(to.getX()+1)){
                     //basic move
@@ -39,6 +41,10 @@ public class Pawn extends Piece {
         }else if(this.getX().equals(to.getX()-1)
                 && (this.getY().equals(to.getY()+1)
                 || this.getY().equals(to.getY()-1))){
+            if(state[to.getX()][to.getY()] >= 0 && this.getColor().equals(PlayerColor.WHITE))
+                return false;
+            if(state[to.getX()][to.getY()] <= 0 && this.getColor().equals(PlayerColor.BLACK))
+                return false;
             //take
             return true;
         }
@@ -68,5 +74,9 @@ public class Pawn extends Piece {
         if(x-2 >= 0)
             ret.add(new PosXY(x-2, y));
         return ret;
+    }
+    @Override
+    public String toString() {
+        return super.toString() + " Pawn";
     }
 }

@@ -1,5 +1,6 @@
 package logic;
 
+
 public class Board {
     private Player whitePlayer;
     private Player blackPlayer;
@@ -26,17 +27,18 @@ public class Board {
         this.state = state;
     }
     public PosXY[] getComputerMove(PlayerColor color){
+        System.out.println("[Board] state:\n" + this.toString());
         return color.equals(PlayerColor.WHITE) ?
-                this.whitePlayer.getComputerMove():
-                this.blackPlayer.getComputerMove();
+                this.whitePlayer.getComputerMove(this.state):
+                this.blackPlayer.getComputerMove(this.state);
     }
     /*TODO check if position is attacked in board for King*/
     /*TODO en passant */
     /*TODO castling */
     public Boolean isMoveLegal(PlayerColor color, PosXY[] move){
         if(color.equals(PlayerColor.WHITE))
-            return this.whitePlayer.isMoveLegal(move);
-        return this.blackPlayer.isMoveLegal(move);
+            return this.whitePlayer.isMoveLegal(move, this.state);
+        return this.blackPlayer.isMoveLegal(move, this.state);
     }
     public Integer[][] getState() {
         return state;
@@ -44,13 +46,26 @@ public class Board {
     public void setState(Integer[][] state) {
         this.state = state;
     }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            sb.append(String.format("%2d", state[i][0]));
+            for (int j = 1; j < 8; j++) {
+                sb.append(String.format(" %2d", state[i][j]));
+            }
+            sb.append("\n");
+        }
+        sb.setLength(sb.length()-1);
+        return sb.toString();
+    }
     public boolean isOver() {
         return this.isOver;
     }
     public void move(PlayerColor color, PosXY[] move){
         if(color.equals(PlayerColor.WHITE))
-            whitePlayer.move(move[0], move[1]);
+            this.state = whitePlayer.move(move[0], move[1], this.state);
         else
-            blackPlayer.move(move[0], move[1]);
+            this.state = blackPlayer.move(move[0], move[1], this.state);
     }
 }

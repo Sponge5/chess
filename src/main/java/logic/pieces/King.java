@@ -45,4 +45,8 @@ public class King extends Piece {
         }
         return ret;
     }
+    @Override
+    public String toString() {
+        return super.toString() + " King";
+    }
 }

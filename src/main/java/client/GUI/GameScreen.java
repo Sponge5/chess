@@ -20,7 +20,7 @@ public class GameScreen {
         this.pane.add(this.boardPane, 0, 0);
         this.saveGame = new Button("Save Game");
         this.pane.add(this.saveGame, 0, 1);
-        this.scene = new Scene(this.pane);
+        this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
         stage.show();
     }

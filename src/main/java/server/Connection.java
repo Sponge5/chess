@@ -37,15 +37,15 @@ public class Connection extends Thread{
                     this.conSocket.getOutputStream());
             if(this.twoClients){
                 while(true){
-                    System.out.println("Server waiting for move from client...");
+                    System.out.println("[Connection] Server waiting for move from client...");
                     recvMove();
-                    System.out.println("Server sending move to client");
+                    System.out.println("[Connection] Server sending move to client");
                     sendMove();
                 }
             }else{
                 /* single client */
                 while (true) {
-                    System.out.println("Server waiting for move from client...");
+                    System.out.println("[Connection] Server waiting for move from client...");
                     recvMove();
                     this.color = this.color.equals(PlayerColor.WHITE) ?
                             PlayerColor.BLACK : PlayerColor.WHITE;
@@ -59,6 +59,7 @@ public class Connection extends Thread{
         PosXY[] move;
         while (true) {
             String moveString = this.inFromClient.readLine();
+            System.out.println("[Connection] Server received move:\n" + moveString);
             move = ClientCommunication.posFromString(moveString);
             if (this.board.isMoveLegal(this.color, move)) {
                 this.outToClient.writeBytes("ok\n");

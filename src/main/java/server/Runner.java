@@ -1,6 +1,5 @@
 package server;
 
-import logic.Board;
 import logic.PlayerColor;
 import logic.PosXY;
 
@@ -39,7 +38,7 @@ public class Runner implements Runnable{
                 this.secondCon.start();
                 twoPlayerGame();
             }else{
-                this.connection = new Connection(this.serverSocket, !twoClients,
+                this.connection = new Connection(this.serverSocket, twoClients,
                         PlayerColor.WHITE);
                 this.connection.run();
             }

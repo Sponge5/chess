@@ -57,7 +57,7 @@ public class BoardPane extends GridPane {
         char c = 'a';
         for (int i = 0; i < 8; i++) {
             Label label = new Label(String.valueOf(c));
-            Label label1 = new Label(String.valueOf(i));
+            Label label1 = new Label(String.valueOf(i+1));
             label.setMinSize(MinDims.BUTTON.width, MinDims.BUTTON.height);
             label1.setMinSize(MinDims.BUTTON.width, MinDims.BUTTON.height);
             label.setAlignment(Pos.CENTER);

@@ -7,54 +7,54 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Player {
-    private PlayerColor color;
     private ArrayList<Piece> pieces;
-    private Integer[][] state;
+    private PlayerColor color;
     private Time time;
 
-    /*TODO update piece upon move as well*/
-
     /* random move */
-    public PosXY[] getComputerMove(){
-        PosXY[] ret;
-        do {
-            Random rand = new Random();
-            Piece p = this.pieces.get(rand.nextInt(this.pieces.size()));
-            ret = p.getRandomMove(this.state);
-        }while(ret == null);
+    public PosXY[] getComputerMove(Integer state[][]){
+        PosXY[] ret = null;
+        Random rand = new Random();
+        ArrayList<Piece> tempPieces = new ArrayList<Piece>(this.pieces);
+        while(ret == null && !tempPieces.isEmpty()) {
+            Piece p = tempPieces.remove(rand.nextInt(tempPieces.size()));
+            System.out.println("[Player] random piece:\n" + p.toString());
+            ret = p.getRandomMove(state);
+            if (ret != null)
+                System.out.println("[Player] random move:\n" + ret[0].toString() + " " + ret[1].toString());
+        }
         return ret;
     }
     /* checks if move[] is legal for current state */
-    public Boolean isMoveLegal(PosXY move[]){
+    public Boolean isMoveLegal(PosXY move[], Integer state[][]){
         for (Piece p :
                 this.pieces) {
             if (p.getPosXY().equals(move[0])) {
-                return p.moveValid(move[1], this.state);
+                return p.moveValid(move[1], state);
             }
         }
         return false;
     }
     /* applies move to state[][] */
-    public void move(PosXY from, PosXY to) {
+    public Integer[][] move(PosXY from, PosXY to, Integer state[][]) {
         Piece p = getPiece(from);
         if(p == null)
-            this.state = null;
-        this.move(p, to);
+            return null;
+        return this.move(p, to, state);
     }
-    public void move(Piece p, PosXY to) {
-        this.state = p.move(to, this.state);
+    public Integer[][] move(Piece p, PosXY to, Integer[][] state) {
+        return p.move(to, state);
     }
 
     public Player(PlayerColor color, Integer[][] state){
         this.color = color;
-        this.state = state;
         this.pieces = new ArrayList<Piece>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 switch (
                         color.equals(PlayerColor.WHITE) ?
-                                this.state[i][j]
-                                : -this.state[i][j]){
+                                state[i][j]
+                                : -state[i][j]){
                     case 1:
                         this.pieces.add(new Pawn(color, i, j));
                         break;
@@ -84,8 +84,5 @@ public class Player {
                 return p;
         }
         return null;
-    }
-    public void setState(Integer[][] state) {
-        this.state = state;
     }
 }

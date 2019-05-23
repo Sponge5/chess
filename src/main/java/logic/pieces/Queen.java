@@ -92,4 +92,8 @@ public class Queen extends Piece {
         }
         return ret;
     }
+    @Override
+    public String toString() {
+        return super.toString() + " Queen";
+    }
 }

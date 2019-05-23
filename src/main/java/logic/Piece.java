@@ -14,6 +14,7 @@ public abstract class Piece implements PieceIF{
 
     public Integer[][] move(PosXY to, Integer[][] state) {
         state[this.getX()][this.getY()] = 0;
+        this.posXY = to;
         return state;
     }
 
@@ -22,12 +23,12 @@ public abstract class Piece implements PieceIF{
         ret[0] = this.getPosXY();
         ArrayList<PosXY> dests = this.getAllDestinations();
         Random rand = new Random();
-        do {
+        while(!dests.isEmpty()){
             ret[1] = dests.remove(rand.nextInt(dests.size()));
-            if(ret[1] == null)
-                return null;
-        }while(!this.moveValid(ret[1], state));
-        return ret;
+            if(this.moveValid(ret[1], state))
+                return ret;
+        }
+        return null;
     }
 
     public PlayerColor getColor() {
@@ -53,5 +54,10 @@ public abstract class Piece implements PieceIF{
     }
     public void setY(Integer y){
         this.posXY.setY(y);
+    }
+
+    @Override
+    public String toString() {
+        return  this.posXY.toString() + " " + this.color.toString();
     }
 }

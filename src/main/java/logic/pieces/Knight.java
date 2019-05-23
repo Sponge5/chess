@@ -22,7 +22,9 @@ public class Knight extends Piece {
             return false;
         if(state[to.getX()][to.getY()] < 0 && this.getColor().equals(PlayerColor.BLACK))
             return false;
-        return true;
+        if(this.getAllDestinations().contains(to))
+            return true;
+        return false;
     }
 
     public ArrayList<PosXY> getAllDestinations() {
@@ -54,5 +56,9 @@ public class Knight extends Piece {
                 ret.add(new PosXY(x+2, y+1));
         }
         return ret;
+    }
+    @Override
+    public String toString() {
+        return super.toString() + " Knight";
     }
 }

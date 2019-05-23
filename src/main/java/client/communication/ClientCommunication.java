@@ -16,7 +16,7 @@ public class ClientCommunication implements Runnable{
     private DataOutputStream outToServer;
     private LinkedBlockingQueue<PosXY[]> outMove;
     private LinkedBlockingQueue<PosXY[]> inMove;
-    private LinkedBlockingQueue<Boolean> updateGUI;
+    private LinkedBlockingQueue<Boolean> moveAcceptedByServer;
     private Boolean remote;
     private PlayerColor color;
 
@@ -26,7 +26,7 @@ public class ClientCommunication implements Runnable{
         this.color = color;
         this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
         this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
-        this.updateGUI = new LinkedBlockingQueue<Boolean>(1);
+        this.moveAcceptedByServer = new LinkedBlockingQueue<Boolean>(1);
 
     }
     public void run() {
@@ -62,20 +62,16 @@ public class ClientCommunication implements Runnable{
      */
     public void remoteGame() throws Exception {
         if(this.color.equals(PlayerColor.BLACK)) {
-            System.out.println("Client waiting for move from server...");
             recvMove();
         }
         while(true){
-            System.out.println("Client waiting for move from GUI...");
             sendMove();
-            System.out.println("Client waiting for move from server...");
             recvMove();
         }
     }
 
     public void localGame() throws Exception{
         while(true){
-            System.out.println("Client waiting for move from GUI...");
             sendMove();
         }
     }
@@ -88,12 +84,14 @@ public class ClientCommunication implements Runnable{
         while(true) {
             /* move is valid according to board logic */
             PosXY move[] = this.outMove.take();
+            System.out.println("[ClientCommunication] client sending move to server");
             this.outToServer.writeBytes(move[0].toString() + " " + move[1].toString() + "\n");
             String response = this.inFromServer.readLine();
             if (response.equals("ok")) {
-                //move was accepted -> update GUI
-                this.updateGUI.put(true);
+                this.moveAcceptedByServer.put(true);
                 break;
+            }else{
+                this.moveAcceptedByServer.put(false);
             }
         }
     }
@@ -114,5 +112,9 @@ public class ClientCommunication implements Runnable{
     }
     public LinkedBlockingQueue<PosXY[]> getInMove() {
         return inMove;
+    }
+
+    public LinkedBlockingQueue<Boolean> getMoveAcceptedByServer() {
+        return moveAcceptedByServer;
     }
 }
