@@ -56,7 +56,6 @@ public class Bishop extends Piece {
             if(x+i <= 7 && y+i <= 7)
                 ret.add(new PosXY(x+i, y+i));
         }
-        System.out.println(ret.toString());
         return ret;
     }
 

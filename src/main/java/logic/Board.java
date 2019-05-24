@@ -1,10 +1,12 @@
 package logic;
 
 
+import javafx.scene.layout.Pane;
 import logic.pieces.*;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Board {
     private ArrayList<Piece> pieces;
@@ -89,8 +91,6 @@ public class Board {
         }
         return ret;
     }
-    /*TODO check if position is attacked in board for King*/
-    /*TODO change pawn on last square */
     /*TODO en passant */
     /*TODO castling */
     /*TODO check */
@@ -99,30 +99,80 @@ public class Board {
         for (Piece p :
                 this.pieces) {
             if (p.getPosXY().equals(move[0]) && p.getColor().equals(color)) {
-                return p.moveValid(move[1], state);
+                /* check if destination is attacked for king move*/
+                if(p instanceof King){
+                    if(destAttacked(color, move[1]))
+                        return false;
+//                    /* castling */
+//                    if(!((King) p).hasMoved && moveIsCastle(p, move))
+//                        return true;
+                }
+                return p.moveValid(move[1], this.state);
             }
         }
         return false;
     }
-    public Integer[][] getState() {
-        return state;
+
+    /**
+     *
+     * @param color color of our piece
+     * @param dest destination of our piece
+     * @return true if enemy piece is attacking square at dest
+     */
+    public Boolean destAttacked(PlayerColor color, PosXY dest){
+        for (Piece p :
+                this.pieces) {
+            if(p.getColor().equals(color))
+                continue;
+            /* for pawn only diagonal moves */
+            if(p instanceof Pawn){
+                Integer[][] newState = new Integer[this.state.length][];
+                for (int i = 0; i < this.state.length; i++) {
+                    newState[i] = this.state[i].clone();
+                }
+                newState[dest.getX()][dest.getY()] = color.equals(PlayerColor.WHITE) ?
+                        1 : -1;
+                if(p.moveValid(dest, newState)) {
+                    System.out.println("[Board] square " + dest.toString()
+                            + " attacked by " + p.toString());
+                    return true;
+                }
+            }else if(p.moveValid(dest, this.state)) {
+                System.out.println("[Board] square " + dest.toString()
+                        + " attacked by " + p.toString());
+                return true;
+            }
+        }
+        return false;
     }
-    public boolean isOver() {
-        return this.isOver;
-    }
+    /*TODO return bool and check in runner */
+    /*TODO let player choose pawn replacement */
     public void move(PosXY[] move){
-        Piece p = getPiece(move[0]);
-        if(p == null){
+        Piece sourcePiece = getPiece(move[0]);
+        Piece destPiece = getPiece(move[1]);
+        if(sourcePiece == null){
             System.out.println("[Board] Couldn't find source piece");
             return;
         }
-        this.state = p.move(move[1], this.state);
-        p = getPiece(move[1]);
-        if(p != null){
-            System.out.println("[Board] Couldn't find destination piece");
+        this.pieces.remove(sourcePiece);
+        /* Change Pawn */
+        this.state = sourcePiece.move(move[1], this.state);
+        sourcePiece.setPosXY(move[1]);
+        if(sourcePiece instanceof Pawn &&
+                ((sourcePiece.getColor().equals(PlayerColor.WHITE)
+                 && move[1].getX().equals(0))
+                ||(sourcePiece.getColor().equals(PlayerColor.BLACK)
+                 && move[1].getX().equals(7)))){
+                sourcePiece = new Queen(sourcePiece.getColor(),
+                        move[1].getX(), move[1].getY());
         }
-        this.pieces.remove(p);
+        this.pieces.add(sourcePiece);
+        if(destPiece == null)
+            System.out.println("[Board] Couldn't find destination piece");
+        else
+            this.pieces.remove(destPiece);
     }
+
     Piece getPiece(PosXY pos){
         for (Piece p:
                 this.pieces) {
@@ -143,6 +193,12 @@ public class Board {
         }
         sb.setLength(sb.length()-1);
         return sb.toString();
+    }
+    public Integer[][] getState() {
+        return state;
+    }
+    public boolean isOver() {
+        return this.isOver;
     }
     public void setState(Integer[][] state) {
         this.state = state;

@@ -44,9 +44,7 @@ public abstract class Piece implements PieceIF{
         }
         return false;
     }
-    public PlayerColor getColor() {
-        return color;
-    }
+
     public void setColor(PlayerColor color) {
         this.color = color;
     }
@@ -56,8 +54,14 @@ public abstract class Piece implements PieceIF{
     public Integer getY(){
         return this.posXY.getY();
     }
+    public PlayerColor getColor() {
+        return color;
+    }
     public PosXY getPosXY() {
         return posXY;
+    }
+    public void setPosXY(PosXY posXY) {
+        this.posXY = posXY;
     }
     @Override
     public String toString() {

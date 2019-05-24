@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class King extends Piece {
+    public Boolean hasMoved;
+
     public King(PlayerColor color, Integer x, Integer y) {
         super(color, x, y);
+        this.hasMoved = false;
     }
 
     @Override
@@ -34,17 +37,23 @@ public class King extends Piece {
         int x = this.getX();
         int y = this.getY();
         if(x-1 >= 0){
+            ret.add(new PosXY(x-1, y));
             if(y-1 >= 0)
                 ret.add(new PosXY(x-1, y-1));
             if(y+1 <= 7)
                 ret.add(new PosXY(x-1, y+1));
         }
         if(x+1 <= 7){
+            ret.add(new PosXY(x+1, y));
             if(y-1 >= 0)
-                ret.add(new PosXY(x+1, y-1));
+                ret.add(new PosXY(x + 1, y - 1));
             if(y+1 <= 7)
-                ret.add(new PosXY(x+1, y+1));
+                ret.add(new PosXY(x + 1, y + 1));
         }
+        if (y - 1 >= 0)
+            ret.add(new PosXY(x, y-1));
+        if(y+1 <= 7)
+            ret.add(new PosXY(x, y+1));
         return ret;
     }
     @Override

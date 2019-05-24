@@ -47,6 +47,7 @@ public class Connection extends Thread{
                 while (true) {
                     System.out.println("[Connection] Server waiting for move from client...");
                     recvMove();
+                    System.out.println("[Connection] board:\n" + this.board.toString());
                     this.color = this.color.equals(PlayerColor.WHITE) ?
                             PlayerColor.BLACK : PlayerColor.WHITE;
                 }
@@ -62,6 +63,7 @@ public class Connection extends Thread{
             System.out.println("[Connection] Server received move:\n" + moveString);
             move = ClientCommunication.posFromString(moveString);
             if (this.board.isMoveLegal(this.color, move)) {
+                this.board.move(move);
                 this.outToClient.writeBytes("ok\n");
                 break;
             }

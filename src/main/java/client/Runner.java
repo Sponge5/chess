@@ -150,6 +150,8 @@ public class Runner extends Application{
                 System.out.println("[client/Runner] updating GUI");
                 Platform.runLater(updateGUI);
                 System.out.println("[client/Runner] board:\n" + board.toString());
+                if(this.board.isOver())
+                    break;
                 this.color = this.color.otherColor();
                 if (this.computer) {
                     System.out.println("[client/Runner] getting move from AI");

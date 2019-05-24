@@ -1,4 +1,3 @@
-client/GUI/BoardPane$1.class
 server/Connection.class
 logic/PieceValue.class
 logic/pieces/King.class
