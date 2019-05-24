@@ -37,7 +37,6 @@ public class Runner extends Application{
     public static void main(String[] args){
         launch();
     }
-    /*TODO connect to remote game */
     public void start(final Stage stage) {
         this.ms = new MenuScreen();
         this.ms.setVsComputerBtn(new Button("Player vs Computer"));
@@ -105,11 +104,7 @@ public class Runner extends Application{
     }
 
     void runGame() throws Exception{
-        Runnable updateGUI = new Runnable() {
-            public void run() {
-                gameScreen.getBoardPane().setMoveButtons();
-            }
-        };
+        Runnable updateGUI = () -> gameScreen.getBoardPane().setMoveButtons();
         /* game vs remote player */
         if(this.remote) {
             /* we are black -> enemy starting */
@@ -125,7 +120,7 @@ public class Runner extends Application{
                 System.out.println("[client/Runner] waiting for move from GUI");
                 getMove();
                 System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
-                this.board.move(this.color, this.move);
+                this.board.move(this.move);
                 System.out.println("[client/Runner] putting player move out to communication");
                 this.comm.getOutMove().put(move);
                 System.out.println("[client/Runner] waiting for server confirmation");
@@ -147,7 +142,7 @@ public class Runner extends Application{
                 System.out.println("[client/Runner] waiting for move from GUI");
                 getMove();
                 System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
-                this.board.move(this.color, this.move);
+                this.board.move(this.move);
                 System.out.println("[client/Runner] putting player move out to communication");
                 this.comm.getOutMove().put(move);
                 System.out.println("[client/Runner] waiting for server confirmation");
@@ -160,7 +155,7 @@ public class Runner extends Application{
                     System.out.println("[client/Runner] getting move from AI");
                     this.move = board.getComputerMove(this.color);
                     System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
-                    this.board.move(this.color, this.move);
+                    this.board.move(this.move);
                     System.out.println("[client/Runner] putting computer move out to communication");
                     this.comm.getOutMove().put(move);
                     System.out.println("[client/Runner] setting move in logic");
@@ -174,7 +169,7 @@ public class Runner extends Application{
                     System.out.println("[client/Runner] waiting for move from GUI");
                     getMove();
                     System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
-                    this.board.move(this.color, this.move);
+                    this.board.move(this.move);
                     System.out.println("[client/Runner] putting player move out to communication");
                     this.comm.getOutMove().put(move);
                     System.out.println("[client/Runner] waiting for server confirmation");

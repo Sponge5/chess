@@ -30,18 +30,14 @@ public class BoardPane extends GridPane {
         this.move = new PosXY[2];
         this.setAlignment(Pos.CENTER);
         this.squareButtons = new Button[8][8];
-        this.gridButtonHandler = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent mouseEvent) {
-                setMove(mouseEvent);
-            }
-        };
+        this.gridButtonHandler = mouseEvent -> setMove(mouseEvent);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 this.squareButtons[i][j] = new Button("");
                 this.squareButtons[i][j].setMinSize(MinDims.BUTTON.width, MinDims.BUTTON.height);
                 this.squareButtons[i][j].setUserData(new PosXY(i, j));
                 this.squareButtons[i][j].setOnMouseClicked(this.gridButtonHandler);
-                this.squareButtons[i][j].setStyle("-fx-font: 18 arial;");
+                this.squareButtons[i][j].setStyle("-fx-font: 30 arial;");
                 if((i+j) % 2 != 0)
                     this.squareButtons[i][j].setBackground(new Background(
                             new BackgroundFill(Paint.valueOf("grey"),
@@ -62,8 +58,8 @@ public class BoardPane extends GridPane {
             label1.setMinSize(MinDims.BUTTON.width, MinDims.BUTTON.height);
             label.setAlignment(Pos.CENTER);
             label1.setAlignment(Pos.CENTER);
-            label.setStyle("-fx-font: 16 arial;");
-            label1.setStyle("-fx-font: 16 arial;");
+            label.setStyle("-fx-font: 30 arial;");
+            label1.setStyle("-fx-font: 30 arial;");
             this.add(label1, 8, 7-i);
             this.add(label, i, 8);
             c++;

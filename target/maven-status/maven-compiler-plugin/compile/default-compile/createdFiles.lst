@@ -2,7 +2,6 @@ client/GUI/BoardPane$1.class
 server/Connection.class
 logic/PieceValue.class
 logic/pieces/King.class
-client/Runner$3.class
 client/Runner$2.class
 client/GUI/ChessSymbols.class
 Main.class
@@ -23,6 +22,5 @@ logic/Piece.class
 logic/pieces/Rook.class
 logic/PlayerColor.class
 client/GUI/MenuScreen.class
-logic/Player.class
 client/Runner$1.class
 client/Runner.class

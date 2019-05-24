@@ -20,6 +20,8 @@ public class King extends Piece {
     }
 
     public Boolean moveValid(PosXY to, Integer[][] state) {
+        if(!this.getAllDestinations().contains(to))
+            return false;
         if(state[to.getX()][to.getY()] < 0 && this.getColor().equals(PlayerColor.BLACK))
             return false;
         if(state[to.getX()][to.getY()] > 0 && this.getColor().equals(PlayerColor.WHITE))
