@@ -10,6 +10,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
+import logic.Move;
 import logic.PlayerColor;
 import logic.PosXY;
 
@@ -19,18 +20,19 @@ public class BoardPane extends GridPane {
     private Button[][] squareButtons;
     private EventHandler<MouseEvent> gridButtonHandler;
     private Integer[][] state;
-    private PosXY[] move;
+    private Move move;
     private PlayerColor playerColor;
     private LinkedBlockingQueue<Boolean> outMoveReady;
 
     /*TODO flip board based on color */
+
     public BoardPane(Integer[][] state, PlayerColor color){
         this.state = state;
         this.playerColor = color;
-        this.move = new PosXY[2];
+        this.move = new Move();
         this.setAlignment(Pos.CENTER);
         this.squareButtons = new Button[8][8];
-        this.gridButtonHandler = mouseEvent -> setMove(mouseEvent);
+        this.gridButtonHandler = this::setMove;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 this.squareButtons[i][j] = new Button("");
@@ -64,22 +66,18 @@ public class BoardPane extends GridPane {
             this.add(label, i, 8);
             c++;
         }
-        this.outMoveReady = new LinkedBlockingQueue<Boolean>(1);
+        this.outMoveReady = new LinkedBlockingQueue<>(1);
     }
 
-    /**
-     * Set move based on mouseEvent and wait for move in moveReady
-     * @param mouseEvent
-     */
+    /** Set move based on mouseEvent and wait for move in moveReady */
     public void setMove(MouseEvent mouseEvent){
-        if(this.move[0] != null && this.move[1] != null){
-            this.move[0] = null;
-            this.move[1] = null;
+        if(this.move == null || this.move.getDest() != null){
+            this.move = new Move();
         }
-        if (this.move[0] == null) {
-            this.move[0] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
+        if (this.move.getSrc() == null) {
+            this.move.setSrc((PosXY) ((Node) mouseEvent.getSource()).getUserData());
         }else{
-            this.move[1] = (PosXY) ((Node) mouseEvent.getSource()).getUserData();
+            this.move.setDest((PosXY) ((Node) mouseEvent.getSource()).getUserData());
             /* get move out to Runner */
             try {
                 this.outMoveReady.put(true);
@@ -89,11 +87,17 @@ public class BoardPane extends GridPane {
             }
         }
     }
+
+    /**
+     * Changes text of buttons based on this.move
+     * also updates this.state based on this.move
+     */
     public void setMoveButtons(){
-        Integer x1 = this.move[0].getX(),
-                x2 = this.move[1].getX(),
-                y1 = this.move[0].getY(),
-                y2 = this.move[1].getY();
+        //updateState();
+        Integer x1 = this.move.getSrc().getX(),
+                x2 = this.move.getDest().getX(),
+                y1 = this.move.getSrc().getY(),
+                y2 = this.move.getDest().getY();
         String pieceTxt = this.squareButtons[x1][y1].getText();
         for (Node node :
                 this.getChildren()) {
@@ -103,6 +107,9 @@ public class BoardPane extends GridPane {
                 ((Button) node).setText(pieceTxt);
         }
     }
+    /**
+     * Set buttons text based on this.state
+     */
     public void setButtons(){
         for (int i = 0; i < this.state.length; i++) {
             for (int j = 0; j < this.state[i].length; j++) {
@@ -150,13 +157,25 @@ public class BoardPane extends GridPane {
             }
         }
     }
+    /**
+     * updates state based on this.move
+     */
+    public void updateState(){
+        this.state[this.move.getDest().getX()][this.move.getDest().getY()] =
+                this.state[this.move.getSrc().getX()][this.move.getSrc().getY()];
+        this.state[this.move.getSrc().getX()][this.move.getSrc().getY()] = 0;
+    }
     public LinkedBlockingQueue<Boolean> getOutMoveReady() {
         return outMoveReady;
     }
-    public PosXY[] getMove() {
+    public Move getMove() {
         return move;
     }
-    public void setMove(PosXY[] move) {
+    public void setMove(Move move) {
         this.move = move;
+    }
+
+    public Integer[][] getState() {
+        return state;
     }
 }

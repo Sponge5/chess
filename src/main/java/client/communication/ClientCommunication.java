@@ -1,5 +1,6 @@
 package client.communication;
 
+import logic.Move;
 import logic.PlayerColor;
 import logic.PosXY;
 
@@ -15,21 +16,22 @@ public class ClientCommunication implements Runnable{
     private Socket clientSocket;
     private BufferedReader inFromServer;
     private DataOutputStream outToServer;
-    private LinkedBlockingQueue<PosXY[]> outMove;
-    private LinkedBlockingQueue<PosXY[]> inMove;
+    private LinkedBlockingQueue<Move> outMove;
+    private LinkedBlockingQueue<Move> inMove;
     private LinkedBlockingQueue<Boolean> moveAcceptedByServer;
     private Boolean remote;
     private PlayerColor color;
 
     public ClientCommunication(String address, Integer port, Boolean remote, PlayerColor color){
+        System.out.println("[ClientComm] construct address: " + address);
+        System.out.println("[ClientComm] construct port: " + port.toString());
         this.address = address;
         this.port = port;
         this.remote = remote;
         this.color = color;
-        this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
-        this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
+        this.outMove = new LinkedBlockingQueue<Move>(1);
+        this.inMove = new LinkedBlockingQueue<Move>(1);
         this.moveAcceptedByServer = new LinkedBlockingQueue<Boolean>(1);
-
     }
     public void run() {
         try {
@@ -49,21 +51,20 @@ public class ClientCommunication implements Runnable{
      * @throws Exception
      */
     public void connect() throws Exception {
-        if(!(this.address == null)){
-            try{
+        if(this.address == null){
+            this.clientSocket = new Socket("localhost", this.port);
+        }else {
+            try {
                 this.clientSocket = new Socket(this.address, this.port);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("[ClientCommunication] Socket() threw exception");
                 this.clientSocket = new Socket("localhost", this.port);
             }
-        }else
-            this.clientSocket = new Socket("localhost", this.port);
+        }
         this.outToServer = new DataOutputStream(
-                this.clientSocket.getOutputStream()
-        );
+                this.clientSocket.getOutputStream());
         this.inFromServer = new BufferedReader(
-                new InputStreamReader(this.clientSocket.getInputStream())
-        );
+                new InputStreamReader(this.clientSocket.getInputStream()));
     }
 
     /**
@@ -93,9 +94,9 @@ public class ClientCommunication implements Runnable{
     public void sendMove() throws Exception{
         while(true) {
             /* move is valid according to board logic */
-            PosXY move[] = this.outMove.take();
+            Move move = this.outMove.take();
             System.out.println("[ClientCommunication] client sending move to server");
-            this.outToServer.writeBytes(move[0].toString() + " " + move[1].toString() + "\n");
+            this.outToServer.writeBytes(move.getSrc().toString() + " " + move.getDest().toString() + "\n");
             String response = this.inFromServer.readLine();
             if (response.equals("ok")) {
                 this.moveAcceptedByServer.put(true);
@@ -106,21 +107,23 @@ public class ClientCommunication implements Runnable{
         }
     }
     public void recvMove() throws Exception{
+        System.out.println("[ClientComm] waiting for line");
         String moveString = this.inFromServer.readLine();
+        System.out.println("[ClientComm] received line " + moveString);
         this.inMove.put(posFromString(moveString));
     }
-    public static PosXY[] posFromString(String s){
+    public static Move posFromString(String s){
         String[] nums = s.split(" ");
-        PosXY[] move = new PosXY[2];
-        move[0] = new PosXY(Integer.parseInt(nums[0]), Integer.parseInt(nums[1]));
-        move[1] = new PosXY(Integer.parseInt(nums[2]), Integer.parseInt(nums[3]));
+        Move move = new Move(
+                new PosXY(Integer.parseInt(nums[0]), Integer.parseInt(nums[1])),
+                new PosXY(Integer.parseInt(nums[2]), Integer.parseInt(nums[3])));
         return move;
     }
 
-    public LinkedBlockingQueue<PosXY[]> getOutMove() {
+    public LinkedBlockingQueue<Move> getOutMove() {
         return outMove;
     }
-    public LinkedBlockingQueue<PosXY[]> getInMove() {
+    public LinkedBlockingQueue<Move> getInMove() {
         return inMove;
     }
 

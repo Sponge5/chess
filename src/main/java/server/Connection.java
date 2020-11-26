@@ -2,6 +2,7 @@ package server;
 
 import client.communication.ClientCommunication;
 import logic.Board;
+import logic.Move;
 import logic.PlayerColor;
 import logic.PosXY;
 
@@ -16,7 +17,7 @@ public class Connection extends Thread{
     private DataOutputStream outToClient;
     private Socket conSocket;
     private Boolean twoClients;
-    private LinkedBlockingQueue<PosXY[]> inMove, outMove;
+    private LinkedBlockingQueue<Move> inMove, outMove;
     private Board board;
     private PlayerColor color;
 
@@ -25,29 +26,36 @@ public class Connection extends Thread{
         this.twoClients = twoClients;
         this.board = new Board();
         this.color = color;
-        this.inMove = new LinkedBlockingQueue<PosXY[]>(1);
-        this.outMove = new LinkedBlockingQueue<PosXY[]>(1);
+        this.inMove = new LinkedBlockingQueue<>(1);
+        this.outMove = new LinkedBlockingQueue<>(1);
     }
     public void run() {
         try {
+            System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
+                    "] waiting for connection from client");
             this.conSocket = this.serverSocket.accept();
+            System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
+                    "] accepted connection from client");
             this.inFromClient = new BufferedReader(
                     new InputStreamReader(this.conSocket.getInputStream()));
             this.outToClient = new DataOutputStream(
                     this.conSocket.getOutputStream());
             if(this.twoClients){
+                if(this.color.equals(PlayerColor.BLACK)){
+                    sendMove();
+                }
                 while(true){
-                    System.out.println("[Connection] Server waiting for move from client...");
+                    System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
+                    "] Server waiting for move from client...");
                     recvMove();
-                    System.out.println("[Connection] Server sending move to client");
                     sendMove();
                 }
             }else{
                 /* single client */
                 while (true) {
-                    System.out.println("[Connection] Server waiting for move from client...");
+                    System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
+                    "] Server waiting for move from client...");
                     recvMove();
-                    System.out.println("[Connection] board:\n" + this.board.toString());
                     this.color = this.color.equals(PlayerColor.WHITE) ?
                             PlayerColor.BLACK : PlayerColor.WHITE;
                 }
@@ -57,10 +65,11 @@ public class Connection extends Thread{
         }
     }
     private void recvMove() throws Exception {
-        PosXY[] move;
+        Move move;
         while (true) {
             String moveString = this.inFromClient.readLine();
-            System.out.println("[Connection] Server received move:\n" + moveString);
+            System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
+                    "] Server received move:\n" + moveString);
             move = ClientCommunication.posFromString(moveString);
             if (this.board.isMoveLegal(this.color, move)) {
                 this.board.move(move);
@@ -73,13 +82,15 @@ public class Connection extends Thread{
             this.inMove.put(move);
     }
     private void sendMove() throws Exception{
-        PosXY[] move = this.outMove.take();
-        this.outToClient.writeBytes(move[0].toString() + " " + move[1].toString());
+        Move move = this.outMove.take();
+        System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
+                "] Server sending move to client");
+        this.outToClient.writeBytes(move.getSrc().toString() + " " + move.getDest().toString());
     }
-    public LinkedBlockingQueue<PosXY[]> getInMove() {
+    public LinkedBlockingQueue<Move> getInMove() {
         return inMove;
     }
-    public LinkedBlockingQueue<PosXY[]> getOutMove() {
+    public LinkedBlockingQueue<Move> getOutMove() {
         return outMove;
     }
     public Board getBoard() {

@@ -2,24 +2,25 @@ package client;
 
 import client.GUI.GameScreen;
 import client.GUI.MenuScreen;
-import client.GUI.MinDims;
 import client.communication.ClientCommunication;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import logic.Board;
+import logic.Move;
 import logic.PlayerColor;
 import logic.PosXY;
 
-import java.awt.event.ActionEvent;
-
-/*TODO adaptive GUI to window size */
+/**
+ * Runner class for client
+ *
+ * The gui thread runs as this one, creates new thread(s) for communication
+ */
 public class Runner extends Application{
     private ClientCommunication comm;
     private String address;
@@ -27,7 +28,7 @@ public class Runner extends Application{
     private MenuScreen ms;
     private GameScreen gameScreen;
     private Board board;
-    private PosXY[] move;
+    private Move move;
     private PlayerColor color;
     private Service<Void> gameService;
     private Task<Void> task;
@@ -42,12 +43,12 @@ public class Runner extends Application{
         this.ms.setVsComputerBtn(new Button("Player vs Computer"));
         this.ms.getVsComputerBtn().setOnMouseClicked((MouseEvent) -> {
             System.out.println("[client/Runner] Game vs computer clicked");
-            setupAndRun(stage, false, true, PlayerColor.WHITE);
+            setup(stage, false, true, PlayerColor.WHITE);
         });
         this.ms.setTwoPlayerBtn(new Button("Player vs Player"));
         this.ms.getTwoPlayerBtn().setOnMouseClicked((mouseEvent -> {
             System.out.println("[client/Runner] Game vs player clicked");
-            setupAndRun(stage, false, false, PlayerColor.WHITE);
+            setup(stage, false, false, PlayerColor.WHITE);
         }));
         this.ms.setAddressTextField(new TextField("Enter server address here"));
         this.ms.setAddressTFEventHandler((ActionEvent) -> {
@@ -60,30 +61,32 @@ public class Runner extends Application{
             System.out.println("[client/Runner] PortNum entered in TextField");
             setPort(stage);
         });
+        this.ms.setBlackBtn(new RadioButton("Play as black"));
         this.ms.getPortTextField().setOnAction(this.ms.getPortTFEventHandler());
         this.ms.setConnectAndPlayBtn(new Button("Connect and Play"));
         this.ms.getConnectAndPlayBtn().setOnMouseClicked((MouseEvent) -> {
             System.out.println("[client/Runner] Connect and Play clicked");
-            if(this.address == null)
-                System.out.println("[client/Runner] Address is empty");
-            if(this.port == null)
-                System.out.println("[client/Runner] Port is empty");
-            setupAndRun(stage, true, false, PlayerColor.WHITE);
+            if(this.ms.getBlackBtn().isSelected()){
+                setup(stage, true, false, PlayerColor.BLACK);
+            }else{
+                setup(stage, true, false, PlayerColor.WHITE);
+            }
         });
         this.ms.mainMenu(stage);
     }
 
     /**
+     * Sets up logic and this class
      * @param stage stage for GameScreen
      * @param remote true if playing online
      * @param computer true if playing vs computer
      * @param color color of player moving pieces of his GUI
      */
-    private void setupAndRun(Stage stage, Boolean remote,
-                             Boolean computer, final PlayerColor color) {
+    private void setup(Stage stage, Boolean remote,
+                       Boolean computer, final PlayerColor color) {
         /* Garbage collector should clean ms */
         this.ms = null;
-        /* setupAndRun runner */
+        /* setup runner */
         this.color = color;
         this.computer = computer;
         this.remote = remote;
@@ -103,23 +106,30 @@ public class Runner extends Application{
         this.gameService.start();
     }
 
+    /**
+     * runs three types of game:
+     *      remote
+     *      local (vs computer)
+     *      local (2 players)
+     * @throws Exception
+     */
     void runGame() throws Exception{
-        Runnable updateGUI = () -> gameScreen.getBoardPane().setMoveButtons();
+        Runnable updateGUI = () -> this.gameScreen.getBoardPane().setMoveButtons();
         /* game vs remote player */
         if(this.remote) {
             /* we are black -> enemy starting */
-            if (color.equals(PlayerColor.BLACK)) {
+            if (this.color.equals(PlayerColor.BLACK)) {
                 System.out.println("[client/Runner] waiting for move from server");
-                move = comm.getInMove().take();
+                this.move = this.comm.getInMove().take();
                 System.out.println("[client/Runner] setting move in logic");
-                gameScreen.getBoardPane().setMove(move);
+                this.gameScreen.getBoardPane().setMove(this.move);
                 System.out.println("[client/Runner] updating GUI");
                 Platform.runLater(updateGUI);
             }
             while (!this.board.isOver()) {
                 System.out.println("[client/Runner] waiting for move from GUI");
                 getMove();
-                System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
+                System.out.println("[client/Runner] " + this.move.toString());
                 this.board.move(this.move);
                 System.out.println("[client/Runner] putting player move out to communication");
                 this.comm.getOutMove().put(move);
@@ -129,9 +139,9 @@ public class Runner extends Application{
                 Platform.runLater(updateGUI);
                 System.out.println("[client/Runner] board:\n" + board.toString());
                 System.out.println("[client/Runner] waiting for move from server");
-                move = comm.getInMove().take();
+                this.move = comm.getInMove().take();
                 System.out.println("[client/Runner] setting move in logic");
-                gameScreen.getBoardPane().setMove(move);
+                this.gameScreen.getBoardPane().setMove(move);
                 System.out.println("[client/Runner] updating GUI");
                 Platform.runLater(updateGUI);
             }
@@ -141,22 +151,22 @@ public class Runner extends Application{
             while(!this.board.isOver()) {
                 System.out.println("[client/Runner] waiting for move from GUI");
                 getMove();
-                System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
+                System.out.println("[client/Runner] move:\n" + this.move.toString());
                 this.board.move(this.move);
                 System.out.println("[client/Runner] putting player move out to communication");
-                this.comm.getOutMove().put(move);
+                this.comm.getOutMove().put(this.move);
                 System.out.println("[client/Runner] waiting for server confirmation");
                 this.comm.getMoveAcceptedByServer().take();
                 System.out.println("[client/Runner] updating GUI");
                 Platform.runLater(updateGUI);
-                System.out.println("[client/Runner] board:\n" + board.toString());
+                System.out.println("[client/Runner] board:\n" + this.board.toString());
                 if(this.board.isOver())
                     break;
                 this.color = this.color.otherColor();
                 if (this.computer) {
                     System.out.println("[client/Runner] getting move from AI");
                     this.move = board.getComputerMove(this.color);
-                    System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
+                    System.out.println("[client/Runner] move:\n" + this.move.toString());
                     this.board.move(this.move);
                     System.out.println("[client/Runner] putting computer move out to communication");
                     this.comm.getOutMove().put(move);
@@ -166,11 +176,11 @@ public class Runner extends Application{
                     this.comm.getMoveAcceptedByServer().take();
                     System.out.println("[client/Runner] updating GUI");
                     Platform.runLater(updateGUI);
-                    System.out.println("[client/Runner] board:\n" + board.toString());
+                    System.out.println("[client/Runner] board:\n" + this.board.toString());
                 }else{
                     System.out.println("[client/Runner] waiting for move from GUI");
                     getMove();
-                    System.out.println("[client/Runner] move: " + this.move[0].toString() + " " + this.move[1].toString());
+                    System.out.println("[client/Runner] move:\n" + this.move.toString());
                     this.board.move(this.move);
                     System.out.println("[client/Runner] putting player move out to communication");
                     this.comm.getOutMove().put(move);
@@ -189,8 +199,6 @@ public class Runner extends Application{
      * service running in parallel with GUI without blocking it
      */
     void setupGameService(){
-        /* get move from GUI, check, update gui,
-         * send to server, wait for response, update gui */
         this.task = new Task<Void>() {
             protected Void call() throws Exception {
                 runGame();
@@ -222,7 +230,7 @@ public class Runner extends Application{
         while (true){
             this.gameScreen.getBoardPane().getOutMoveReady().take();
             this.move = this.gameScreen.getBoardPane().getMove();
-            if (board.isMoveLegal(this.color, this.move)) {
+            if (this.board.isMoveLegal(this.color, this.move)) {
                 break;
             }
         }

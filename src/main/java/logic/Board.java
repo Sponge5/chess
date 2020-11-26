@@ -1,13 +1,18 @@
 package logic;
 
 
-import javafx.scene.layout.Pane;
 import logic.pieces.*;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
 
+/*TODO pawn transform */
+/*TODO check */
+/*TODO check mate */
+/*TODO en passant */
+/*TODO castling */
+/*TODO blocking check */
+/*TODO discovered check */
 public class Board {
     private ArrayList<Piece> pieces;
     private Integer[][] state;
@@ -79,8 +84,8 @@ public class Board {
             }
         }
     }
-    public PosXY[] getComputerMove(PlayerColor color){
-        PosXY[] ret = null;
+    public Move getComputerMove(PlayerColor color){
+        Move ret = null;
         Random rand = new Random();
         ArrayList<Piece> tempPieces = new ArrayList<Piece>(this.pieces);
         while(ret == null && !tempPieces.isEmpty()) {
@@ -91,37 +96,82 @@ public class Board {
         }
         return ret;
     }
-    /*TODO en passant */
-    /*TODO castling */
-    /*TODO check */
-    /*TODO check mate */
-    public Boolean isMoveLegal(PlayerColor color, PosXY[] move){
+    public Boolean isMoveLegal(PlayerColor color, Move move){
         for (Piece p :
                 this.pieces) {
-            if (p.getPosXY().equals(move[0]) && p.getColor().equals(color)) {
+            if (p.getPos().equals(move.getSrc()) && p.getColor().equals(color)) {
                 /* check if destination is attacked for king move*/
                 if(p instanceof King){
-                    if(destAttacked(color, move[1]))
-                        return false;
-//                    /* castling */
-//                    if(!((King) p).hasMoved && moveIsCastle(p, move))
-//                        return true;
+                    if(destAttacked(color, move.getDest())) return false;
+                    if(moveIsCastle(p, move)) return true;
                 }
-                return p.moveValid(move[1], this.state);
+                return p.moveValid(move.getDest(), this.state);
             }
         }
         return false;
     }
 
     /**
-     *
+     * moveIsCastle is a bypass function for Piece.moveValid() which means
+     * we need to take care of all edgecases
+     * @param p
+     * @param move
+     * @return
+     */
+    private Boolean moveIsCastle(Piece p, Move move){
+        if(p.getHasMoved().equals(true)) return false;
+        Piece rook;
+        if(p.getColor().equals(PlayerColor.WHITE)){
+            if(move.getDest().getX().equals(7) && move.getDest().getY().equals(2)){
+                /* find corresponding rook */
+                rook = getRook(PlayerColor.WHITE, new PosXY(7, 0));
+                if(rook == null) return false;
+                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 3))) return false;
+                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 2))) return false;
+                return true;
+            } else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)) {
+                rook = getRook(PlayerColor.WHITE, new PosXY(7,7));
+                if(rook == null) return false;
+                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 5))) return false;
+                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 6))) return false;
+                return true;
+            }
+        }else if(p.getColor().equals(PlayerColor.BLACK)){
+            if(move.getDest().getX().equals(2) && move.getDest().getY().equals(0)){
+                rook = getRook(PlayerColor.BLACK, new PosXY(0,0));
+                if(rook == null) return false;
+                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 3))) return false;
+                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 2))) return false;
+                return true;
+            }else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)){
+                rook = getRook(PlayerColor.BLACK, new PosXY(0,7));
+                if(rook == null) return false;
+                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 5))) return false;
+                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 6))) return false;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Piece getRook(PlayerColor color, PosXY pos){
+        for(Piece p: this.pieces) {
+            if (p instanceof Rook
+                    && p.getColor().equals(color)
+                    && !p.getHasMoved()
+                    && p.getPos().equals(pos))
+                return p;
+        }
+        return null;
+    }
+
+    /**
      * @param color color of our piece
      * @param dest destination of our piece
      * @return true if enemy piece is attacking square at dest
      */
     public Boolean destAttacked(PlayerColor color, PosXY dest){
-        for (Piece p :
-                this.pieces) {
+        for (Piece p : this.pieces) {
             if(p.getColor().equals(color))
                 continue;
             /* for pawn only diagonal moves */
@@ -145,38 +195,82 @@ public class Board {
         }
         return false;
     }
-    /*TODO return bool and check in runner */
-    /*TODO let player choose pawn replacement */
-    public void move(PosXY[] move){
-        Piece sourcePiece = getPiece(move[0]);
-        Piece destPiece = getPiece(move[1]);
+    public void move(Move move){
+        Piece sourcePiece = getPiece(move.getSrc());
+        Piece destPiece = getPiece(move.getDest());
         if(sourcePiece == null){
             System.out.println("[Board] Couldn't find source piece");
             return;
         }
         this.pieces.remove(sourcePiece);
+        this.state = sourcePiece.move(move.getSrc(), this.state);
+        sourcePiece.setPos(move.getDest());
         /* Change Pawn */
-        this.state = sourcePiece.move(move[1], this.state);
-        sourcePiece.setPosXY(move[1]);
         if(sourcePiece instanceof Pawn &&
                 ((sourcePiece.getColor().equals(PlayerColor.WHITE)
-                 && move[1].getX().equals(0))
-                ||(sourcePiece.getColor().equals(PlayerColor.BLACK)
-                 && move[1].getX().equals(7)))){
-                sourcePiece = new Queen(sourcePiece.getColor(),
-                        move[1].getX(), move[1].getY());
+                        && move.getDest().getX().equals(0))
+                        ||(sourcePiece.getColor().equals(PlayerColor.BLACK)
+                        && move.getDest().getX().equals(7)))){
+            sourcePiece = new Queen(sourcePiece.getColor(),
+                    move.getDest().getX(), move.getDest().getY());
+            this.state[move.getDest().getX()][move.getDest().getY()] =
+                    sourcePiece.getColor().equals(PlayerColor.WHITE) ?
+                            5 : -5;
         }
+        /* castling */
+        if(moveIsCastle(sourcePiece, move))
+            castle(move);
         this.pieces.add(sourcePiece);
-        if(destPiece == null)
-            System.out.println("[Board] Couldn't find destination piece");
-        else
+        if(!(destPiece == null))
             this.pieces.remove(destPiece);
     }
 
-    Piece getPiece(PosXY pos){
+    public void castle(Move move){
+        Piece rook;
+        PosXY rookDest;
+        if(this.state[move.getSrc().getX()][move.getSrc().getY()] == 6){
+            if(move.getDest().getX().equals(2) && move.getDest().getY().equals(7)){
+                /* find corresponding rook */
+                rook = getRook(PlayerColor.WHITE, new PosXY(7,0));
+                if(rook == null) return;
+                this.pieces.remove(rook);
+                rookDest = new PosXY(7, 3);
+                this.state = rook.move(rookDest, this.state);
+                rook.setPos(rookDest);
+                this.pieces.add(rook);
+            } else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)) {
+                rook = getRook(PlayerColor.WHITE, new PosXY(7,7));
+                if(rook == null) return;
+                this.pieces.remove(rook);
+                rookDest = new PosXY(7, 5);
+                this.state = rook.move(rookDest, this.state);
+                rook.setPos(rookDest);
+                this.pieces.add(rook);
+            }
+        }else if(this.state[move.getSrc().getX()][move.getSrc().getY()] == -6){
+            if(move.getDest().getX().equals(2) && move.getDest().getY().equals(0)){
+                rook = getRook(PlayerColor.BLACK, new PosXY(0,0));
+                if(rook == null) return;
+                this.pieces.remove(rook);
+                rookDest = new PosXY(0, 3);
+                this.state = rook.move(rookDest, this.state);
+                rook.setPos(rookDest);
+                this.pieces.add(rook);
+            }else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)){
+                rook = getRook(PlayerColor.BLACK, new PosXY(0,7));
+                this.pieces.remove(rook);
+                rookDest = new PosXY(0, 5);
+                this.state = rook.move(rookDest, this.state);
+                rook.setPos(rookDest);
+                this.pieces.add(rook);
+            }
+        }
+    }
+
+    public Piece getPiece(PosXY pos){
         for (Piece p:
                 this.pieces) {
-            if(p.getPosXY().equals(pos))
+            if(p.getPos().equals(pos))
                 return p;
         }
         return null;

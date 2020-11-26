@@ -8,11 +8,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class King extends Piece {
-    public Boolean hasMoved;
-
     public King(PlayerColor color, Integer x, Integer y) {
         super(color, x, y);
-        this.hasMoved = false;
     }
 
     @Override
@@ -33,7 +30,7 @@ public class King extends Piece {
     }
 
     public ArrayList<PosXY> getAllDestinations() {
-        ArrayList<PosXY> ret = new ArrayList<PosXY>();
+        ArrayList<PosXY> ret = new ArrayList<>();
         int x = this.getX();
         int y = this.getY();
         if(x-1 >= 0){

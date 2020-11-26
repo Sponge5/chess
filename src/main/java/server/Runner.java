@@ -1,5 +1,6 @@
 package server;
 
+import logic.Move;
 import logic.PlayerColor;
 import logic.PosXY;
 
@@ -8,21 +9,17 @@ import java.net.ServerSocket;
 public class Runner implements Runnable{
     private Boolean twoClients;
     private ServerSocket serverSocket;
+    private ServerSocket serverSocket2;
     private Connection firstCon, secondCon, connection;
     private int defaultPort = 8888;
+    private int defaultPort2 = 8889;
 
     public Runner(Boolean remote){
         this.twoClients = remote;
         try {
             this.serverSocket = new ServerSocket(this.defaultPort);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-    public Runner(int port, Boolean remote){
-        this.twoClients = remote;
-        try {
-            this.serverSocket = new ServerSocket(port);
+            if(remote)
+                this.serverSocket2 = new ServerSocket(this.defaultPort2);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -32,7 +29,7 @@ public class Runner implements Runnable{
             if(this.twoClients){
                 this.firstCon = new Connection(this.serverSocket, twoClients,
                         PlayerColor.WHITE);
-                this.secondCon = new Connection(this.serverSocket, twoClients,
+                this.secondCon = new Connection(this.serverSocket2, twoClients,
                         PlayerColor.BLACK);
                 this.firstCon.start();
                 this.secondCon.start();
@@ -49,11 +46,15 @@ public class Runner implements Runnable{
     }
     public void twoPlayerGame() throws Exception{
         while(true) {
-            PosXY[] move = this.firstCon.getInMove().take();
+            System.out.println("[server/Runner] waiting for move from first connection");
+            Move move = this.firstCon.getInMove().take();
+            System.out.println("[server/Runner] " + move.toString());
             this.secondCon.getOutMove().put(move);
             if(this.firstCon.getBoard().isOver())
                 break;
+            System.out.println("[server/Runner] waiting for move from second connection");
             move = this.secondCon.getInMove().take();
+            System.out.println("[server/Runner] " + move.toString());
             this.firstCon.getOutMove().put(move);
             if(this.secondCon.getBoard().isOver())
                 break;

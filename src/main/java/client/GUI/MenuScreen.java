@@ -1,6 +1,7 @@
 package client.GUI;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ public class MenuScreen{
     private Button mainMenuBtn;
     private Button vsComputerBtn;
     private Button twoPlayerBtn;
+    private RadioButton blackBtn;
     private Button connectAndPlayBtn;
     private TextField portTextField;
     private TextField addressTextField;
@@ -141,8 +143,9 @@ public class MenuScreen{
         this.pane.setVgap(5);
         this.pane.add(this.addressTextField, 0, 0);
         this.pane.add(this.portTextField, 0, 1);
-        this.pane.add(this.connectAndPlayBtn, 0, 2);
-        this.pane.add(this.mainMenuBtn, 0, 3);
+        this.pane.add(this.blackBtn, 0, 2);
+        this.pane.add(this.connectAndPlayBtn, 0, 3);
+        this.pane.add(this.mainMenuBtn, 0, 4);
         this.scene = new Scene(this.pane, MinDims.SCENE.width, MinDims.SCENE.height);
         stage.setScene(this.scene);
     }
@@ -188,5 +191,11 @@ public class MenuScreen{
     }
     public void setTwoPlayerBtn(Button twoPlayerBtn) {
         this.twoPlayerBtn = twoPlayerBtn;
+    }
+    public RadioButton getBlackBtn() {
+        return blackBtn;
+    }
+    public void setBlackBtn(RadioButton blackBtn) {
+        this.blackBtn = blackBtn;
     }
 }

@@ -1,37 +1,38 @@
 # SEMESTRAL PROJECT - CHESS
 Client/server application using JavaFX
 
-(**Mandatory**/Optional)
-* [ ] **Chess logic**
-* [ ] **JavaFX GUI (multithreading)**
-* [ ] **Clock**
-* [ ] **2 players 1 machine**
-* [ ] **Player vs AI**
-* [ ] **Save Game**
-* [ ] **Manual board setup**
-* [ ] Client/Server
-* [ ] PGN-completeness
-* [ ] Advanced AI
+## Requirements
+
+Open JDK 10
 
 ## Running
 
 Compile
+
 `
 	make
 `
 
-Only client -> can only play local game
+Run client in order to play local games
 
 `
 	make client
 `
 
-Run server in order to play remote game
+Run server and two clients in order to play remote game
 
 `
 	make server
 `
+
+HIT ENTER AFTER EACH TEXTFIELD ENTRY
+
+To play as white, type localhost as address and 8888 as port to play as white, 
+then hit connect, on second client type localhost, 8889 and check
+the radio button.
+
 Testing
+
 `
 	make test
 `

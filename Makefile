@@ -1,5 +1,5 @@
 compile:
-	mvn clean compile
+	mvn -X -e clean compile
 
 client:
 	mvn exec:java -Dexec.arguments=client

@@ -5,27 +5,30 @@ import java.util.Random;
 
 public abstract class Piece implements PieceIF{
     private PlayerColor color;
-    private PosXY posXY;
+    private PosXY pos;
+    private Boolean hasMoved;
 
     public Piece(PlayerColor color, Integer x, Integer y){
         this.color = color;
-        this.posXY = new PosXY(x,y);
+        this.pos = new PosXY(x,y);
+        this.hasMoved = false;
     }
 
     public Integer[][] move(PosXY to, Integer[][] state) {
         state[this.getX()][this.getY()] = 0;
-        this.posXY = to;
+        this.pos = to;
+        if(this.hasMoved.equals(false))
+            this.hasMoved = true;
         return state;
     }
 
-    public PosXY[] getRandomMove(Integer[][] state) {
-        PosXY[] ret = new PosXY[2];
-        ret[0] = this.getPosXY();
+    public Move getRandomMove(Integer[][] state) {
+        Move ret = new Move();
         ArrayList<PosXY> dests = this.getAllDestinations();
         Random rand = new Random();
         while(!dests.isEmpty()){
-            ret[1] = dests.remove(rand.nextInt(dests.size()));
-            if(this.moveValid(ret[1], state))
+            ret.setDest(dests.remove(rand.nextInt(dests.size())));
+            if(this.moveValid(ret.getDest(), state))
                 return ret;
         }
         return null;
@@ -49,22 +52,25 @@ public abstract class Piece implements PieceIF{
         this.color = color;
     }
     public Integer getX(){
-        return this.posXY.getX();
+        return this.pos.getX();
     }
     public Integer getY(){
-        return this.posXY.getY();
+        return this.pos.getY();
     }
     public PlayerColor getColor() {
         return color;
     }
-    public PosXY getPosXY() {
-        return posXY;
+    public PosXY getPos() {
+        return pos;
     }
-    public void setPosXY(PosXY posXY) {
-        this.posXY = posXY;
+    public Boolean getHasMoved(){
+        return this.hasMoved;
+    }
+    public void setPos(PosXY pos) {
+        this.pos = pos;
     }
     @Override
     public String toString() {
-        return  this.posXY.toString() + " " + this.color.toString();
+        return  this.pos.toString() + " " + this.color.toString();
     }
 }

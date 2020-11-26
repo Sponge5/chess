@@ -1,5 +1,5 @@
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if(args == null || args.length == 0){
             /* run client */
             System.out.println("[Main] Running client");
@@ -12,9 +12,7 @@ public class Main {
             } else if (args[0].equals("server")) {
                 /* run server */
                 System.out.println("[Main] Running server");
-                server.Runner srv = new server.Runner(8888, true);
-                Integer port = srv.getPort();
-                System.out.println("[Main] server port: " + port.toString());
+                server.Runner srv = new server.Runner(true);
                 srv.run();
             }
         }

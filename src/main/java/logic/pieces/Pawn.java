@@ -66,24 +66,27 @@ public class Pawn extends Piece {
         ArrayList<PosXY> ret = new ArrayList<PosXY>();
         int x = this.getX();
         int y = this.getY();
-        if(x+1 <= 7) {
-            ret.add(new PosXY(x + 1, y));
-            if(y-1 >= 0)
-                ret.add(new PosXY(x+1, y-1));
-            if(y+1 <= 7)
-                ret.add(new PosXY(x+1, y+1));
+        if(this.getColor().equals(PlayerColor.WHITE)){
+            if(x-1 >= 0){
+                ret.add(new PosXY(x-1, y));
+                if(y-1 >= 0)
+                    ret.add(new PosXY(x-1, y-1));
+                if(y+1 <= 7)
+                    ret.add(new PosXY(x-1, y+1));
+            }
+            if(x == 6)
+                ret.add(new PosXY(4, y));
+        }else {
+            if (x + 1 <= 7) {
+                ret.add(new PosXY(x + 1, y));
+                if (y - 1 >= 0)
+                    ret.add(new PosXY(x + 1, y - 1));
+                if (y + 1 <= 7)
+                    ret.add(new PosXY(x + 1, y + 1));
+            }
+            if (x == 1)
+                ret.add(new PosXY(3, y));
         }
-        if(x+2 <= 7)
-            ret.add(new PosXY(x+2, y));
-        if(x-1 >= 0){
-            ret.add(new PosXY(x-1, y));
-            if(y-1 >= 0)
-                ret.add(new PosXY(x-1, y-1));
-            if(y+1 <= 7)
-                ret.add(new PosXY(x-1, y+1));
-        }
-        if(x-2 >= 0)
-            ret.add(new PosXY(x-2, y));
         return ret;
     }
     @Override
