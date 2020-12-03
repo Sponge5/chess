@@ -34,16 +34,18 @@ public class Board {
         this.pieces = new ArrayList<>();
         setPieces();
     }
+
     public Board(Integer[][] state){
         this.isOver = false;
         this.state = state;
-        this.pieces = new ArrayList<>();
         setPieces();
     }
+
     public void setPieces(){
+        this.pieces = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                switch (state[i][j]){
+                switch (this.state[i][j]){
                     case 1:
                         this.pieces.add(new Pawn(PlayerColor.WHITE, i, j));
                         break;
@@ -84,18 +86,20 @@ public class Board {
             }
         }
     }
+
     public Move getComputerMove(PlayerColor color){
         Move ret = null;
         Random rand = new Random();
-        ArrayList<Piece> tempPieces = new ArrayList<Piece>(this.pieces);
+        ArrayList<Piece> tempPieces = new ArrayList<>(this.pieces);
         while(ret == null && !tempPieces.isEmpty()) {
             Piece p = tempPieces.remove(rand.nextInt(tempPieces.size()));
             if(p.getColor().equals(color.otherColor()))
                 continue;
-            ret = p.getRandomMove(state);
+            ret = p.getRandomMove(this.state);
         }
         return ret;
     }
+
     public Boolean isMoveLegal(PlayerColor color, Move move){
         for (Piece p :
                 this.pieces) {
@@ -171,6 +175,7 @@ public class Board {
      * @return true if enemy piece is attacking square at dest
      */
     public Boolean destAttacked(PlayerColor color, PosXY dest){
+        String destAttStr = new String("[Board] square " + dest.toString() + " attacked by ");
         for (Piece p : this.pieces) {
             if(p.getColor().equals(color))
                 continue;
@@ -180,21 +185,23 @@ public class Board {
                 for (int i = 0; i < this.state.length; i++) {
                     newState[i] = this.state[i].clone();
                 }
-                newState[dest.getX()][dest.getY()] = color.equals(PlayerColor.WHITE) ?
-                        1 : -1;
+                newState[dest.getX()][dest.getY()] = color.equals(PlayerColor.WHITE) ? 1 : -1;
                 if(p.moveValid(dest, newState)) {
-                    System.out.println("[Board] square " + dest.toString()
-                            + " attacked by " + p.toString());
+                    System.out.println(destAttStr + p.toString());
                     return true;
                 }
             }else if(p.moveValid(dest, this.state)) {
-                System.out.println("[Board] square " + dest.toString()
-                        + " attacked by " + p.toString());
+                System.out.println(destAttStr + p.toString());
                 return true;
             }
         }
         return false;
     }
+
+    /**
+     * executes move on this.state and this.pieces
+     * @param move input move
+     */
     public void move(Move move){
         Piece sourcePiece = getPiece(move.getSrc());
         Piece destPiece = getPiece(move.getDest());
@@ -203,7 +210,7 @@ public class Board {
             return;
         }
         this.pieces.remove(sourcePiece);
-        this.state = sourcePiece.move(move.getSrc(), this.state);
+        this.state = sourcePiece.move(move.getDest(), this.state);
         sourcePiece.setPos(move.getDest());
         /* Change Pawn */
         if(sourcePiece instanceof Pawn &&
@@ -216,6 +223,7 @@ public class Board {
             this.state[move.getDest().getX()][move.getDest().getY()] =
                     sourcePiece.getColor().equals(PlayerColor.WHITE) ?
                             5 : -5;
+            move.setIsSpecial(true);
         }
         /* castling */
         if(moveIsCastle(sourcePiece, move))
@@ -279,9 +287,9 @@ public class Board {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 8; i++) {
-            sb.append(String.format("%2d", state[i][0]));
+            sb.append(String.format("%2d", this.state[i][0]));
             for (int j = 1; j < 8; j++) {
-                sb.append(String.format(" %2d", state[i][j]));
+                sb.append(String.format(" %2d", this.state[i][j]));
             }
             sb.append("\n");
         }
@@ -289,7 +297,7 @@ public class Board {
         return sb.toString();
     }
     public Integer[][] getState() {
-        return state;
+        return this.state;
     }
     public boolean isOver() {
         return this.isOver;

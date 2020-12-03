@@ -21,14 +21,18 @@ public class BoardPane extends GridPane {
     private EventHandler<MouseEvent> gridButtonHandler;
     private Integer[][] state;
     private Move move;
-    private PlayerColor playerColor;
     private LinkedBlockingQueue<Boolean> outMoveReady;
 
+    /*TODO change pawn on last row*/
     /*TODO flip board based on color */
 
+    /**
+     * Constructor builds BoardPane based on starting board state
+     * @param state starting state
+     * @param color color of player
+     */
     public BoardPane(Integer[][] state, PlayerColor color){
         this.state = state;
-        this.playerColor = color;
         this.move = new Move();
         this.setAlignment(Pos.CENTER);
         this.squareButtons = new Button[8][8];
@@ -69,7 +73,10 @@ public class BoardPane extends GridPane {
         this.outMoveReady = new LinkedBlockingQueue<>(1);
     }
 
-    /** Set move based on mouseEvent and wait for move in moveReady */
+    /**
+     * Set move based on mouseEvent and wait for move in outMoveReady
+     * @param mouseEvent click on button in grid
+     */
     public void setMove(MouseEvent mouseEvent){
         if(this.move == null || this.move.getDest() != null){
             this.move = new Move();
@@ -90,23 +97,22 @@ public class BoardPane extends GridPane {
 
     /**
      * Changes text of buttons based on this.move
-     * also updates this.state based on this.move
+     * TODO doesn't work for pawn change to queen
      */
     public void setMoveButtons(){
-        //updateState();
-        Integer x1 = this.move.getSrc().getX(),
-                x2 = this.move.getDest().getX(),
-                y1 = this.move.getSrc().getY(),
-                y2 = this.move.getDest().getY();
-        String pieceTxt = this.squareButtons[x1][y1].getText();
-        for (Node node :
-                this.getChildren()) {
-            if (GridPane.getRowIndex(node).equals(x1) && GridPane.getColumnIndex(node).equals(y1))
-                ((Button) node).setText("");
-            if (GridPane.getRowIndex(node).equals(x2) && GridPane.getColumnIndex(node).equals(y2))
-                ((Button) node).setText(pieceTxt);
+        if(this.move.getIsSpecial()){
+            setButtons();
+        }else{
+            Integer x1 = this.move.getSrc().getX(),
+                    x2 = this.move.getDest().getX(),
+                    y1 = this.move.getSrc().getY(),
+                    y2 = this.move.getDest().getY();
+            String pieceTxt = this.squareButtons[x1][y1].getText();
+            this.squareButtons[x1][y1].setText("");
+            this.squareButtons[x2][y2].setText(pieceTxt);
         }
     }
+
     /**
      * Set buttons text based on this.state
      */
@@ -157,14 +163,22 @@ public class BoardPane extends GridPane {
             }
         }
     }
+
     /**
-     * updates state based on this.move
+     * compare other state with inner state
+     * @param otherState different state to compare
+     * @return true if states are equal, false if not
      */
-    public void updateState(){
-        this.state[this.move.getDest().getX()][this.move.getDest().getY()] =
-                this.state[this.move.getSrc().getX()][this.move.getSrc().getY()];
-        this.state[this.move.getSrc().getX()][this.move.getSrc().getY()] = 0;
+    public Boolean isStateEqual(Integer[][] otherState){
+        for(int i = 0; i < 8; ++i){
+            for(int j = 0; j < 8; ++j){
+                if(!this.state[i][j].equals(otherState[i][j]))
+                    return false;
+            }
+        }
+        return true;
     }
+
     public LinkedBlockingQueue<Boolean> getOutMoveReady() {
         return outMoveReady;
     }
@@ -174,7 +188,6 @@ public class BoardPane extends GridPane {
     public void setMove(Move move) {
         this.move = move;
     }
-
     public Integer[][] getState() {
         return state;
     }

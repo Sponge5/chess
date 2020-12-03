@@ -22,6 +22,13 @@ public class ClientCommunication implements Runnable{
     private Boolean remote;
     private PlayerColor color;
 
+    /**
+     * Constructor
+     * @param address server IP address
+     * @param port server port being listened at
+     * @param remote true for remote game, false for local
+     * @param color of player playing on client
+     */
     public ClientCommunication(String address, Integer port, Boolean remote, PlayerColor color){
         System.out.println("[ClientComm] construct address: " + address);
         System.out.println("[ClientComm] construct port: " + port.toString());
@@ -29,10 +36,14 @@ public class ClientCommunication implements Runnable{
         this.port = port;
         this.remote = remote;
         this.color = color;
-        this.outMove = new LinkedBlockingQueue<Move>(1);
-        this.inMove = new LinkedBlockingQueue<Move>(1);
-        this.moveAcceptedByServer = new LinkedBlockingQueue<Boolean>(1);
+        this.outMove = new LinkedBlockingQueue<>(1);
+        this.inMove = new LinkedBlockingQueue<>(1);
+        this.moveAcceptedByServer = new LinkedBlockingQueue<>(1);
     }
+
+    /**
+     * runs specific communication, for local game there's 2 players on 1 client
+     */
     public void run() {
         try {
             connect();
@@ -48,9 +59,9 @@ public class ClientCommunication implements Runnable{
 
     /**
      * connect to server and setup stream communication
-     * @throws Exception
+     * @throws Exception if Socket() fails - maybe port occupied
      */
-    public void connect() throws Exception {
+    private void connect() throws Exception {
         if(this.address == null){
             this.clientSocket = new Socket("localhost", this.port);
         }else {
@@ -68,7 +79,7 @@ public class ClientCommunication implements Runnable{
     }
 
     /**
-     * sending move and receiving move from server
+     * sending move to and receiving move from server
      * @throws Exception
      */
     public void remoteGame() throws Exception {
@@ -81,6 +92,10 @@ public class ClientCommunication implements Runnable{
         }
     }
 
+    /**
+     * only sending move to server
+     * @throws Exception
+     */
     public void localGame() throws Exception{
         while(true){
             sendMove();
@@ -106,12 +121,23 @@ public class ClientCommunication implements Runnable{
             }
         }
     }
+
+    /**
+     * Receive move from server
+     * @throws Exception
+     */
     public void recvMove() throws Exception{
         System.out.println("[ClientComm] waiting for line");
         String moveString = this.inFromServer.readLine();
         System.out.println("[ClientComm] received line " + moveString);
         this.inMove.put(posFromString(moveString));
     }
+
+    /**
+     * Convert string to Move
+     * @param s 4 numbers separated by spaces
+     * @return converted string as Move
+     */
     public static Move posFromString(String s){
         String[] nums = s.split(" ");
         Move move = new Move(
@@ -126,7 +152,6 @@ public class ClientCommunication implements Runnable{
     public LinkedBlockingQueue<Move> getInMove() {
         return inMove;
     }
-
     public LinkedBlockingQueue<Boolean> getMoveAcceptedByServer() {
         return moveAcceptedByServer;
     }

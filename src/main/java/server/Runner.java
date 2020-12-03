@@ -2,7 +2,6 @@ package server;
 
 import logic.Move;
 import logic.PlayerColor;
-import logic.PosXY;
 
 import java.net.ServerSocket;
 

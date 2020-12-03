@@ -38,6 +38,11 @@ public class Runner extends Application{
     public static void main(String[] args){
         launch();
     }
+
+    /**
+     * Start GUI and setup logic, communication
+     * @param stage the window to make changes to
+     */
     public void start(final Stage stage) {
         this.ms = new MenuScreen();
         this.ms.setVsComputerBtn(new Button("Player vs Computer"));
@@ -127,72 +132,83 @@ public class Runner extends Application{
                 Platform.runLater(updateGUI);
             }
             while (!this.board.isOver()) {
-                System.out.println("[client/Runner] waiting for move from GUI");
-                getMove();
-                System.out.println("[client/Runner] " + this.move.toString());
-                this.board.move(this.move);
-                System.out.println("[client/Runner] putting player move out to communication");
-                this.comm.getOutMove().put(move);
-                System.out.println("[client/Runner] waiting for server confirmation");
-                this.comm.getMoveAcceptedByServer().take();
-                System.out.println("[client/Runner] updating GUI");
-                Platform.runLater(updateGUI);
-                System.out.println("[client/Runner] board:\n" + board.toString());
-                System.out.println("[client/Runner] waiting for move from server");
-                this.move = comm.getInMove().take();
-                System.out.println("[client/Runner] setting move in logic");
-                this.gameScreen.getBoardPane().setMove(move);
-                System.out.println("[client/Runner] updating GUI");
-                Platform.runLater(updateGUI);
+                remoteRound(updateGUI);
             }
         }
         /* local game */
         else {
             while(!this.board.isOver()) {
-                System.out.println("[client/Runner] waiting for move from GUI");
-                getMove();
-                System.out.println("[client/Runner] move:\n" + this.move.toString());
-                this.board.move(this.move);
-                System.out.println("[client/Runner] putting player move out to communication");
-                this.comm.getOutMove().put(this.move);
-                System.out.println("[client/Runner] waiting for server confirmation");
-                this.comm.getMoveAcceptedByServer().take();
-                System.out.println("[client/Runner] updating GUI");
-                Platform.runLater(updateGUI);
-                System.out.println("[client/Runner] board:\n" + this.board.toString());
-                if(this.board.isOver())
-                    break;
-                this.color = this.color.otherColor();
-                if (this.computer) {
-                    System.out.println("[client/Runner] getting move from AI");
-                    this.move = board.getComputerMove(this.color);
-                    System.out.println("[client/Runner] move:\n" + this.move.toString());
-                    this.board.move(this.move);
-                    System.out.println("[client/Runner] putting computer move out to communication");
-                    this.comm.getOutMove().put(move);
-                    System.out.println("[client/Runner] setting move in logic");
-                    this.gameScreen.getBoardPane().setMove(move);
-                    System.out.println("[client/Runner] waiting for server confirmation");
-                    this.comm.getMoveAcceptedByServer().take();
-                    System.out.println("[client/Runner] updating GUI");
-                    Platform.runLater(updateGUI);
-                    System.out.println("[client/Runner] board:\n" + this.board.toString());
-                }else{
-                    System.out.println("[client/Runner] waiting for move from GUI");
-                    getMove();
-                    System.out.println("[client/Runner] move:\n" + this.move.toString());
-                    this.board.move(this.move);
-                    System.out.println("[client/Runner] putting player move out to communication");
-                    this.comm.getOutMove().put(move);
-                    System.out.println("[client/Runner] waiting for server confirmation");
-                    this.comm.getMoveAcceptedByServer().take();
-                    System.out.println("[client/Runner] updating GUI");
-                    Platform.runLater(updateGUI);
-                    System.out.println("[client/Runner] board:\n" + board.toString());
-                }
-                this.color = this.color.otherColor();
+                localRound(updateGUI);
             }
         }
+    }
+
+    private void remoteRound(Runnable updateGUI) throws Exception{
+        System.out.println("[client/Runner] waiting for move from GUI");
+        getMove();
+        System.out.println("[client/Runner] " + this.move.toString());
+        this.board.move(this.move);
+        System.out.println("[client/Runner] putting player move out to communication");
+        this.comm.getOutMove().put(this.move);
+        System.out.println("[client/Runner] waiting for server confirmation");
+        this.comm.getMoveAcceptedByServer().take();
+        System.out.println("[client/Runner] updating GUI");
+        Platform.runLater(updateGUI);
+        System.out.println("[client/Runner] board:\n" + this.board.toString());
+        System.out.println("[client/Runner] waiting for move from server");
+        this.move = this.comm.getInMove().take();
+        System.out.println("[client/Runner] setting move in logic");
+        this.gameScreen.getBoardPane().setMove(this.move);
+        System.out.println("[client/Runner] updating GUI");
+        Platform.runLater(updateGUI);
+    }
+
+    private void localRound(Runnable updateGUI) throws Exception{
+        System.out.println("[client/Runner] waiting for move from GUI");
+        this.getMove();
+        System.out.println("[client/Runner] move:\n" + this.move.toString());
+        this.board.move(this.move);
+        if (!this.gameScreen.getBoardPane().isStateEqual(this.board.getState())) {
+            System.out.println("DESYNCED!!!!!!");
+        }
+        System.out.println("[client/Runner] putting player move out to communication");
+        this.comm.getOutMove().put(this.move);
+        System.out.println("[client/Runner] waiting for server confirmation");
+        this.comm.getMoveAcceptedByServer().take();
+        System.out.println("[client/Runner] updating GUI");
+        Platform.runLater(updateGUI);
+        System.out.println("[client/Runner] board:\n" + this.board.toString());
+        if (this.board.isOver())
+            return;
+        this.color = this.color.otherColor();
+        if (this.computer) {
+            System.out.println("[client/Runner] getting move from AI");
+            this.move = this.board.getComputerMove(this.color);
+            System.out.println("[client/Runner] move:\n" + this.move.toString());
+            this.board.move(this.move);
+            System.out.println("[client/Runner] putting computer move out to communication");
+            this.comm.getOutMove().put(this.move);
+            System.out.println("[client/Runner] setting move in logic");
+            this.gameScreen.getBoardPane().setMove(this.move);
+            System.out.println("[client/Runner] waiting for server confirmation");
+            this.comm.getMoveAcceptedByServer().take();
+            System.out.println("[client/Runner] updating GUI");
+            Platform.runLater(updateGUI);
+            System.out.println("[client/Runner] board:\n" + this.board.toString());
+        } else {
+            System.out.println("[client/Runner] waiting for move from GUI");
+            getMove();
+            System.out.println("[client/Runner] move:\n" + this.move.toString());
+            this.board.move(this.move);
+            System.out.println("[client/Runner] putting player move out to communication");
+            this.comm.getOutMove().put(move);
+            System.out.println("[client/Runner] waiting for server confirmation");
+            this.comm.getMoveAcceptedByServer().take();
+            System.out.println("[client/Runner] updating GUI");
+            Platform.runLater(updateGUI);
+            System.out.println("[client/Runner] board:\n" + board.toString());
+        }
+        this.color = this.color.otherColor();
     }
 
     /**
@@ -226,7 +242,7 @@ public class Runner extends Application{
      * retrieve a valid move from GUI
      * @throws Exception
      */
-    void getMove() throws Exception {
+    private void getMove() throws Exception {
         while (true){
             this.gameScreen.getBoardPane().getOutMoveReady().take();
             this.move = this.gameScreen.getBoardPane().getMove();

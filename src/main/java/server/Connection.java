@@ -29,6 +29,7 @@ public class Connection extends Thread{
         this.inMove = new LinkedBlockingQueue<>(1);
         this.outMove = new LinkedBlockingQueue<>(1);
     }
+
     public void run() {
         try {
             System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
@@ -64,6 +65,7 @@ public class Connection extends Thread{
             e.printStackTrace();
         }
     }
+
     private void recvMove() throws Exception {
         Move move;
         while (true) {

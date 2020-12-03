@@ -14,7 +14,14 @@ public abstract class Piece implements PieceIF{
         this.hasMoved = false;
     }
 
+    /**
+     * Apply move to given state
+     * @param to position for piece to move to
+     * @param state state to change
+     * @return new state
+     */
     public Integer[][] move(PosXY to, Integer[][] state) {
+        state[to.getX()][to.getY()] = state[this.getX()][this.getY()];
         state[this.getX()][this.getY()] = 0;
         this.pos = to;
         if(this.hasMoved.equals(false))
@@ -22,8 +29,14 @@ public abstract class Piece implements PieceIF{
         return state;
     }
 
+    /**
+     * Get random move out of available destinations
+     * @param state given state for move validation
+     * @return a valid random move
+     */
     public Move getRandomMove(Integer[][] state) {
         Move ret = new Move();
+        ret.setSrc(this.pos);
         ArrayList<PosXY> dests = this.getAllDestinations();
         Random rand = new Random();
         while(!dests.isEmpty()){
