@@ -23,7 +23,6 @@ public class BoardPane extends GridPane {
     private Move move;
     private LinkedBlockingQueue<Boolean> outMoveReady;
 
-    /*TODO change pawn on last row*/
     /*TODO flip board based on color */
 
     /**
@@ -97,7 +96,6 @@ public class BoardPane extends GridPane {
 
     /**
      * Changes text of buttons based on this.move
-     * TODO doesn't work for pawn change to queen
      */
     public void setMoveButtons(){
         if(this.move.getIsSpecial()){

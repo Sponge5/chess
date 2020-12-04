@@ -1,5 +1,8 @@
 package logic;
 
+/**
+ * special moves: castling, pawn transform
+ */
 public class Move {
     private PosXY src;
     private PosXY dest;

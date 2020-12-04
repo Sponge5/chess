@@ -6,13 +6,14 @@ import logic.pieces.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-/*TODO pawn transform */
-/*TODO check */
-/*TODO check mate */
-/*TODO en passant */
 /*TODO castling */
+
+/*TODO check */
 /*TODO blocking check */
 /*TODO discovered check */
+/*TODO check mate */
+
+/*TODO en passant */
 public class Board {
     private ArrayList<Piece> pieces;
     private Integer[][] state;
@@ -132,6 +133,7 @@ public class Board {
                 if(rook == null) return false;
                 if(destAttacked(PlayerColor.WHITE, new PosXY(7, 3))) return false;
                 if(destAttacked(PlayerColor.WHITE, new PosXY(7, 2))) return false;
+                /* TODO this fucking doesn't return true or IDK */
                 return true;
             } else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)) {
                 rook = getRook(PlayerColor.WHITE, new PosXY(7,7));
@@ -210,6 +212,11 @@ public class Board {
             return;
         }
         this.pieces.remove(sourcePiece);
+        /* castling */
+        if(moveIsCastle(sourcePiece, move)) {
+            move.setIsSpecial(true);
+            castle(move);
+        }
         this.state = sourcePiece.move(move.getDest(), this.state);
         sourcePiece.setPos(move.getDest());
         /* Change Pawn */
@@ -225,19 +232,20 @@ public class Board {
                             5 : -5;
             move.setIsSpecial(true);
         }
-        /* castling */
-        if(moveIsCastle(sourcePiece, move))
-            castle(move);
         this.pieces.add(sourcePiece);
         if(!(destPiece == null))
             this.pieces.remove(destPiece);
     }
 
+    /**
+     * update this.state and this.pieces for castle
+     * @param move
+     */
     public void castle(Move move){
         Piece rook;
         PosXY rookDest;
-        if(this.state[move.getSrc().getX()][move.getSrc().getY()] == 6){
-            if(move.getDest().getX().equals(2) && move.getDest().getY().equals(7)){
+        if(this.state[move.getSrc().getX()][move.getSrc().getY()] == PieceValue.KING.value){
+            if(move.getDest().getX().equals(7) && move.getDest().getY().equals(2)){
                 /* find corresponding rook */
                 rook = getRook(PlayerColor.WHITE, new PosXY(7,0));
                 if(rook == null) return;
@@ -246,7 +254,7 @@ public class Board {
                 this.state = rook.move(rookDest, this.state);
                 rook.setPos(rookDest);
                 this.pieces.add(rook);
-            } else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)) {
+            } else if (move.getDest().getX().equals(7) && move.getDest().getY().equals(6)) {
                 rook = getRook(PlayerColor.WHITE, new PosXY(7,7));
                 if(rook == null) return;
                 this.pieces.remove(rook);
@@ -255,8 +263,8 @@ public class Board {
                 rook.setPos(rookDest);
                 this.pieces.add(rook);
             }
-        }else if(this.state[move.getSrc().getX()][move.getSrc().getY()] == -6){
-            if(move.getDest().getX().equals(2) && move.getDest().getY().equals(0)){
+        }else if(this.state[move.getSrc().getX()][move.getSrc().getY()] == -PieceValue.KING.value){
+            if(move.getDest().getX().equals(0) && move.getDest().getY().equals(2)){
                 rook = getRook(PlayerColor.BLACK, new PosXY(0,0));
                 if(rook == null) return;
                 this.pieces.remove(rook);
@@ -264,7 +272,7 @@ public class Board {
                 this.state = rook.move(rookDest, this.state);
                 rook.setPos(rookDest);
                 this.pieces.add(rook);
-            }else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)){
+            }else if (move.getDest().getX().equals(0) && move.getDest().getY().equals(6)){
                 rook = getRook(PlayerColor.BLACK, new PosXY(0,7));
                 this.pieces.remove(rook);
                 rookDest = new PosXY(0, 5);

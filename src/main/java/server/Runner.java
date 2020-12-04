@@ -26,16 +26,13 @@ public class Runner implements Runnable{
     public void run() {
         try {
             if(this.twoClients){
-                this.firstCon = new Connection(this.serverSocket, twoClients,
-                        PlayerColor.WHITE);
-                this.secondCon = new Connection(this.serverSocket2, twoClients,
-                        PlayerColor.BLACK);
+                this.firstCon = new Connection(this.serverSocket, twoClients, PlayerColor.WHITE);
+                this.secondCon = new Connection(this.serverSocket2, twoClients, PlayerColor.BLACK);
                 this.firstCon.start();
                 this.secondCon.start();
                 twoPlayerGame();
             }else{
-                this.connection = new Connection(this.serverSocket, twoClients,
-                        PlayerColor.WHITE);
+                this.connection = new Connection(this.serverSocket, twoClients, PlayerColor.WHITE);
                 this.connection.run();
             }
             this.serverSocket.close();
