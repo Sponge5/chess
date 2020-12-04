@@ -6,8 +6,6 @@ import logic.pieces.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-/*TODO castling */
-
 /*TODO check */
 /*TODO blocking check */
 /*TODO discovered check */
@@ -42,6 +40,9 @@ public class Board {
         setPieces();
     }
 
+    /**
+     * Add pieces to this.pieces based on this.state
+     */
     public void setPieces(){
         this.pieces = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
@@ -88,26 +89,57 @@ public class Board {
         }
     }
 
+    /**
+     * get random move from a random piece
+     * @param color color of computer player
+     * @return move of computer player
+     */
     public Move getComputerMove(PlayerColor color){
         Move ret = null;
-        Random rand = new Random();
+        Random rand = new Random(this.pieces.size());
         ArrayList<Piece> tempPieces = new ArrayList<>(this.pieces);
+        System.out.println("pieces empty? " + tempPieces.isEmpty());
         while(ret == null && !tempPieces.isEmpty()) {
+            System.out.println("we here");
             Piece p = tempPieces.remove(rand.nextInt(tempPieces.size()));
             if(p.getColor().equals(color.otherColor()))
                 continue;
-            ret = p.getRandomMove(this.state);
+            ArrayList<PosXY> dests = p.getAllValidDests(this.state);
+            for(PosXY dest: dests){
+                Move test = new Move(p.getPos(), dest);
+                if(isMoveLegal(color, test))
+                    ret = test;
+            }
         }
         return ret;
     }
 
+    /**
+     * check if given move is legal
+     * @param color color of player playing the move
+     * @param move the move
+     * @return true if move is legal, false otherwise. Outermost check
+     */
     public Boolean isMoveLegal(PlayerColor color, Move move){
-        for (Piece p :
-                this.pieces) {
+        for (Piece p : this.pieces) {
             if (p.getPos().equals(move.getSrc()) && p.getColor().equals(color)) {
+                /* if king is attacked, check if move stops check */
+                if(isKingAttacked(color)){
+                    /* check state after move, if move stops check, return p.moveValid(), otherwise false */
+                    /* apply given move on Board and check if king still checked,
+                       then return to orig state and return accordingly */
+                    Boolean ret = true;
+                    Integer[][] savedState = this.state.clone();
+                    ArrayList<Piece> savedPieces = new ArrayList<>(this.pieces);
+                    this.state = p.move(move.getDest(), savedState);
+                    if(isKingAttacked(color)) ret = false;
+                    this.state = savedState;
+                    this.pieces = new ArrayList<>(savedPieces);
+                    return p.moveValid(move.getDest(), this.state);
+                }
                 /* check if destination is attacked for king move*/
                 if(p instanceof King){
-                    if(destAttacked(color, move.getDest())) return false;
+                    if(posAttacked(color, move.getDest())) return false;
                     if(moveIsCastle(p, move)) return true;
                 }
                 return p.moveValid(move.getDest(), this.state);
@@ -117,11 +149,25 @@ public class Board {
     }
 
     /**
+     * check if king of color in this.pieces is checked
+     * @param color of king
+     * @return true if king is checked
+     */
+    private Boolean isKingAttacked(PlayerColor color){
+        for(Piece p: this.pieces){
+            if(p instanceof King && p.getColor().equals(color)){
+                return posAttacked(color, p.getPos());
+            }
+        }
+        return false;
+    }
+
+    /**
      * moveIsCastle is a bypass function for Piece.moveValid() which means
      * we need to take care of all edgecases
-     * @param p
-     * @param move
-     * @return
+     * @param p any piece, function checks for king implicitly
+     * @param move move to check
+     * @return true if given move is a VALID castling move
      */
     private Boolean moveIsCastle(Piece p, Move move){
         if(p.getHasMoved().equals(true)) return false;
@@ -131,29 +177,28 @@ public class Board {
                 /* find corresponding rook */
                 rook = getRook(PlayerColor.WHITE, new PosXY(7, 0));
                 if(rook == null) return false;
-                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 3))) return false;
-                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 2))) return false;
-                /* TODO this fucking doesn't return true or IDK */
+                if(posAttacked(PlayerColor.WHITE, new PosXY(7, 3))) return false;
+                if(posAttacked(PlayerColor.WHITE, new PosXY(7, 2))) return false;
                 return true;
             } else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)) {
                 rook = getRook(PlayerColor.WHITE, new PosXY(7,7));
                 if(rook == null) return false;
-                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 5))) return false;
-                if(destAttacked(PlayerColor.WHITE, new PosXY(7, 6))) return false;
+                if(posAttacked(PlayerColor.WHITE, new PosXY(7, 5))) return false;
+                if(posAttacked(PlayerColor.WHITE, new PosXY(7, 6))) return false;
                 return true;
             }
         }else if(p.getColor().equals(PlayerColor.BLACK)){
             if(move.getDest().getX().equals(2) && move.getDest().getY().equals(0)){
                 rook = getRook(PlayerColor.BLACK, new PosXY(0,0));
                 if(rook == null) return false;
-                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 3))) return false;
-                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 2))) return false;
+                if(posAttacked(PlayerColor.BLACK, new PosXY(0, 3))) return false;
+                if(posAttacked(PlayerColor.BLACK, new PosXY(0, 2))) return false;
                 return true;
             }else if (move.getDest().getX().equals(6) && move.getDest().getY().equals(7)){
                 rook = getRook(PlayerColor.BLACK, new PosXY(0,7));
                 if(rook == null) return false;
-                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 5))) return false;
-                if(destAttacked(PlayerColor.BLACK, new PosXY(0, 6))) return false;
+                if(posAttacked(PlayerColor.BLACK, new PosXY(0, 5))) return false;
+                if(posAttacked(PlayerColor.BLACK, new PosXY(0, 6))) return false;
                 return true;
             }
         }
@@ -172,12 +217,13 @@ public class Board {
     }
 
     /**
+     * Goes through Board.pieces and checks if any of them has a valid move to piece destination
      * @param color color of our piece
-     * @param dest destination of our piece
+     * @param position destination of our piece
      * @return true if enemy piece is attacking square at dest
      */
-    public Boolean destAttacked(PlayerColor color, PosXY dest){
-        String destAttStr = new String("[Board] square " + dest.toString() + " attacked by ");
+    public Boolean posAttacked(PlayerColor color, PosXY position){
+        String destAttStr = "[Board] square " + position.toString() + " attacked by ";
         for (Piece p : this.pieces) {
             if(p.getColor().equals(color))
                 continue;
@@ -187,12 +233,12 @@ public class Board {
                 for (int i = 0; i < this.state.length; i++) {
                     newState[i] = this.state[i].clone();
                 }
-                newState[dest.getX()][dest.getY()] = color.equals(PlayerColor.WHITE) ? 1 : -1;
-                if(p.moveValid(dest, newState)) {
+                newState[position.getX()][position.getY()] = color.equals(PlayerColor.WHITE) ? 1 : -1;
+                if(p.moveValid(position, newState)) {
                     System.out.println(destAttStr + p.toString());
                     return true;
                 }
-            }else if(p.moveValid(dest, this.state)) {
+            }else if(p.moveValid(position, this.state)) {
                 System.out.println(destAttStr + p.toString());
                 return true;
             }
@@ -239,7 +285,7 @@ public class Board {
 
     /**
      * update this.state and this.pieces for castle
-     * @param move
+     * @param move a castling move
      */
     public void castle(Move move){
         Piece rook;

@@ -48,6 +48,21 @@ public abstract class Piece implements PieceIF{
     }
 
     /**
+     * Get all valid moves from available destinations
+     * @param state given state for move validation
+     * @return a valid random move
+     */
+    public ArrayList<PosXY> getAllValidDests(Integer[][] state){
+        ArrayList<PosXY> dests = this.getAllDestinations();
+        ArrayList<PosXY> ret = new ArrayList<>();
+        for(PosXY dest: dests){
+            if(this.moveValid(dest, state))
+                ret.add(dest);
+        }
+        return ret;
+    }
+
+    /**
      * @return true if square contains piece of same color as this
      */
     public Boolean squareOccupied(PosXY to, Integer[][] state){
