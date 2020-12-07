@@ -1,18 +1,16 @@
 package logic;
 
-
 import logic.pieces.*;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/*TODO check */
-/*TODO blocking check */
-/*TODO discovered check */
 /*TODO check mate */
-
 /*TODO en passant */
 public class Board {
+    private static final Logger LOGGER = Logger.getLogger("[Board]");
     private ArrayList<Piece> pieces;
     private Integer[][] state;
     private boolean isOver;
@@ -98,9 +96,7 @@ public class Board {
         Move ret = null;
         Random rand = new Random(this.pieces.size());
         ArrayList<Piece> tempPieces = new ArrayList<>(this.pieces);
-        System.out.println("pieces empty? " + tempPieces.isEmpty());
         while(ret == null && !tempPieces.isEmpty()) {
-            System.out.println("we here");
             Piece p = tempPieces.remove(rand.nextInt(tempPieces.size()));
             if(p.getColor().equals(color.otherColor()))
                 continue;
@@ -223,7 +219,6 @@ public class Board {
      * @return true if enemy piece is attacking square at dest
      */
     public Boolean posAttacked(PlayerColor color, PosXY position){
-        String destAttStr = "[Board] square " + position.toString() + " attacked by ";
         for (Piece p : this.pieces) {
             if(p.getColor().equals(color))
                 continue;
@@ -234,14 +229,10 @@ public class Board {
                     newState[i] = this.state[i].clone();
                 }
                 newState[position.getX()][position.getY()] = color.equals(PlayerColor.WHITE) ? 1 : -1;
-                if(p.moveValid(position, newState)) {
-                    System.out.println(destAttStr + p.toString());
+                if(p.moveValid(position, newState))
                     return true;
-                }
-            }else if(p.moveValid(position, this.state)) {
-                System.out.println(destAttStr + p.toString());
+            }else if(p.moveValid(position, this.state))
                 return true;
-            }
         }
         return false;
     }
@@ -254,7 +245,7 @@ public class Board {
         Piece sourcePiece = getPiece(move.getSrc());
         Piece destPiece = getPiece(move.getDest());
         if(sourcePiece == null){
-            System.out.println("[Board] Couldn't find source piece");
+            LOGGER.log(Level.INFO, "Couldn't find source piece");
             return;
         }
         this.pieces.remove(sourcePiece);
@@ -290,7 +281,7 @@ public class Board {
     public void castle(Move move){
         Piece rook;
         PosXY rookDest;
-        if(this.state[move.getSrc().getX()][move.getSrc().getY()] == PieceValue.KING.value){
+        if(this.state[move.getSrc().getX()][move.getSrc().getY()] == PieceValue.KING.n){
             if(move.getDest().getX().equals(7) && move.getDest().getY().equals(2)){
                 /* find corresponding rook */
                 rook = getRook(PlayerColor.WHITE, new PosXY(7,0));
@@ -309,7 +300,7 @@ public class Board {
                 rook.setPos(rookDest);
                 this.pieces.add(rook);
             }
-        }else if(this.state[move.getSrc().getX()][move.getSrc().getY()] == -PieceValue.KING.value){
+        }else if(this.state[move.getSrc().getX()][move.getSrc().getY()] == -PieceValue.KING.n){
             if(move.getDest().getX().equals(0) && move.getDest().getY().equals(2)){
                 rook = getRook(PlayerColor.BLACK, new PosXY(0,0));
                 if(rook == null) return;

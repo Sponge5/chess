@@ -1,5 +1,7 @@
 package client;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import client.GUI.GameScreen;
 import client.GUI.MenuScreen;
 import client.communication.ClientCommunication;
@@ -22,6 +24,7 @@ import logic.PosXY;
  * The gui thread runs as this one, creates new thread(s) for communication
  */
 public class Runner extends Application{
+    private static final Logger LOGGER = Logger.getLogger("[client/Runner]");
     private ClientCommunication comm;
     private String address;
     private Integer port;
@@ -47,30 +50,30 @@ public class Runner extends Application{
         this.ms = new MenuScreen();
         this.ms.setVsComputerBtn(new Button("Player vs Computer"));
         this.ms.getVsComputerBtn().setOnMouseClicked((MouseEvent) -> {
-            System.out.println("[client/Runner] Game vs computer clicked");
+            LOGGER.log(Level.ALL, "Game vs computer clicked");
             setup(stage, false, true, PlayerColor.WHITE);
         });
         this.ms.setTwoPlayerBtn(new Button("Player vs Player"));
         this.ms.getTwoPlayerBtn().setOnMouseClicked((mouseEvent -> {
-            System.out.println("[client/Runner] Game vs player clicked");
+            LOGGER.log(Level.ALL, "Game vs player clicked");
             setup(stage, false, false, PlayerColor.WHITE);
         }));
         this.ms.setAddressTextField(new TextField("Enter server address here"));
         this.ms.setAddressTFEventHandler((ActionEvent) -> {
-            System.out.println("[client/Runner] AddressNum entered in TextField");
+            LOGGER.log(Level.ALL, "Address entered in TextField");
             setAddress(stage);
         });
         this.ms.getAddressTextField().setOnAction(this.ms.getAddressTFEventHandler());
         this.ms.setPortTextField(new TextField("Enter port number here"));
         this.ms.setPortTFEventHandler((ActionEvent) -> {
-            System.out.println("[client/Runner] PortNum entered in TextField");
+            LOGGER.log(Level.ALL, "Port entered in TextField");
             setPort(stage);
         });
         this.ms.setBlackBtn(new RadioButton("Play as black"));
         this.ms.getPortTextField().setOnAction(this.ms.getPortTFEventHandler());
         this.ms.setConnectAndPlayBtn(new Button("Connect and Play"));
         this.ms.getConnectAndPlayBtn().setOnMouseClicked((MouseEvent) -> {
-            System.out.println("[client/Runner] Connect and Play clicked");
+            LOGGER.log(Level.ALL, "Connect and Play clicked");
             if(this.ms.getBlackBtn().isSelected()){
                 setup(stage, true, false, PlayerColor.BLACK);
             }else{
@@ -97,11 +100,11 @@ public class Runner extends Application{
         this.remote = remote;
         this.board = new Board();
         if(!this.remote) {
-            System.out.println("[client/Runner] Running server locally");
+            LOGGER.log(Level.INFO, "Running server locally");
             server.Runner server = new server.Runner(this.remote);
             this.port = server.getPort();
-            System.out.println("[client/Runner] Server address:\t" + server.getAddress());
-            System.out.println("[client/Runner] Server port:\t" + this.port);
+            LOGGER.log(Level.INFO, "Server address:\t" + server.getAddress());
+            LOGGER.log(Level.INFO, "Server port:\t" + this.port);
             new Thread(server).start();
         }
         this.comm = new ClientCommunication(this.address, this.port, this.remote, this.color);
@@ -116,7 +119,7 @@ public class Runner extends Application{
      *      remote
      *      local (vs computer)
      *      local (2 players)
-     * @throws Exception
+     * @throws Exception (Interrupted Exception) from LinkedBlockingQueue
      */
     void runGame() throws Exception{
         Runnable updateGUI = () -> this.gameScreen.getBoardPane().setMoveButtons();
@@ -124,11 +127,11 @@ public class Runner extends Application{
         if(this.remote) {
             /* we are black -> enemy starting */
             if (this.color.equals(PlayerColor.BLACK)) {
-                System.out.println("[client/Runner] waiting for move from server");
+                LOGGER.log(Level.ALL, "Waiting for move from server");
                 this.move = this.comm.getInMove().take();
-                System.out.println("[client/Runner] setting move in logic");
+                LOGGER.log(Level.ALL, "Setting move in logic");
                 this.gameScreen.getBoardPane().setMove(this.move);
-                System.out.println("[client/Runner] updating GUI");
+                LOGGER.log(Level.ALL, "Updating GUI");
                 Platform.runLater(updateGUI);
             }
             while (!this.board.isOver()) {
@@ -144,69 +147,69 @@ public class Runner extends Application{
     }
 
     private void remoteRound(Runnable updateGUI) throws Exception{
-        System.out.println("[client/Runner] waiting for move from GUI");
+        LOGGER.log(Level.ALL, "Waiting for move from GUI");
         getMove();
-        System.out.println("[client/Runner] " + this.move.toString());
+        LOGGER.log(Level.INFO, this.move.toString());
         this.board.move(this.move);
-        System.out.println("[client/Runner] putting player move out to communication");
+        LOGGER.log(Level.ALL, "Putting player move out to communication");
         this.comm.getOutMove().put(this.move);
-        System.out.println("[client/Runner] waiting for server confirmation");
+        LOGGER.log(Level.ALL, "Waiting for server confirmation");
         this.comm.getMoveAcceptedByServer().take();
-        System.out.println("[client/Runner] updating GUI");
+        LOGGER.log(Level.ALL, "Updating GUI");
         Platform.runLater(updateGUI);
-        System.out.println("[client/Runner] board:\n" + this.board.toString());
-        System.out.println("[client/Runner] waiting for move from server");
+        LOGGER.log(Level.INFO, "\n" + this.board.toString());
+        LOGGER.log(Level.ALL, "Waiting for move from server");
         this.move = this.comm.getInMove().take();
-        System.out.println("[client/Runner] setting move in logic");
+        LOGGER.log(Level.ALL, "Setting move in logic");
         this.gameScreen.getBoardPane().setMove(this.move);
-        System.out.println("[client/Runner] updating GUI");
+        LOGGER.log(Level.ALL, "Updating GUI");
         Platform.runLater(updateGUI);
     }
 
     private void localRound(Runnable updateGUI) throws Exception{
-        System.out.println("[client/Runner] waiting for move from GUI");
+        LOGGER.log(Level.ALL, "Waiting for move from GUI");
         this.getMove();
-        System.out.println("[client/Runner] move:\n" + this.move.toString());
+        LOGGER.log(Level.INFO, this.move.toString());
         this.board.move(this.move);
         if (!this.gameScreen.getBoardPane().isStateEqual(this.board.getState())) {
             System.out.println("DESYNCED!!!!!!");
         }
-        System.out.println("[client/Runner] putting player move out to communication");
+        LOGGER.log(Level.ALL, "Putting player move out to communication");
         this.comm.getOutMove().put(this.move);
-        System.out.println("[client/Runner] waiting for server confirmation");
+        LOGGER.log(Level.ALL, "Waiting for server confirmation");
         this.comm.getMoveAcceptedByServer().take();
-        System.out.println("[client/Runner] updating GUI");
+        LOGGER.log(Level.ALL, "Updating GUI");
         Platform.runLater(updateGUI);
-        System.out.println("[client/Runner] board:\n" + this.board.toString());
+        LOGGER.log(Level.INFO, "\n" + this.board.toString());
         if (this.board.isOver())
             return;
         this.color = this.color.otherColor();
         if (this.computer) {
-            System.out.println("[client/Runner] getting move from AI");
+            LOGGER.log(Level.ALL, "Getting move from AI");
             this.move = this.board.getComputerMove(this.color);
-            System.out.println("[client/Runner] move:\n" + this.move.toString());
+            LOGGER.log(Level.INFO, this.move.toString());
             this.board.move(this.move);
-            System.out.println("[client/Runner] putting computer move out to communication");
+            LOGGER.log(Level.ALL, "Putting computer move out to communication");
             this.comm.getOutMove().put(this.move);
-            System.out.println("[client/Runner] setting move in logic");
+            LOGGER.log(Level.ALL, "Setting move in logic");
             this.gameScreen.getBoardPane().setMove(this.move);
-            System.out.println("[client/Runner] waiting for server confirmation");
+            LOGGER.log(Level.ALL, "Waiting for server confirmation");
             this.comm.getMoveAcceptedByServer().take();
-            System.out.println("[client/Runner] updating GUI");
+            LOGGER.log(Level.ALL, "Updating GUI");
             Platform.runLater(updateGUI);
-            System.out.println("[client/Runner] board:\n" + this.board.toString());
+            LOGGER.log(Level.INFO, "\n" + this.board.toString());
         } else {
-            System.out.println("[client/Runner] waiting for move from GUI");
+            LOGGER.log(Level.ALL, "Waiting for move from GUI");
             getMove();
-            System.out.println("[client/Runner] move:\n" + this.move.toString());
+            LOGGER.log(Level.INFO, this.move.toString());
             this.board.move(this.move);
-            System.out.println("[client/Runner] putting player move out to communication");
+            LOGGER.log(Level.ALL, "Putting player move out to communication");
             this.comm.getOutMove().put(move);
-            System.out.println("[client/Runner] waiting for server confirmation");
+            LOGGER.log(Level.ALL, "Waiting for server confirmation");
             this.comm.getMoveAcceptedByServer().take();
-            System.out.println("[client/Runner] updating GUI");
+            LOGGER.log(Level.ALL, "Updating GUI");
             Platform.runLater(updateGUI);
-            System.out.println("[client/Runner] board:\n" + board.toString());
+            LOGGER.log(Level.INFO, "\n" + this.board.toString());
         }
         this.color = this.color.otherColor();
     }
@@ -215,13 +218,13 @@ public class Runner extends Application{
      * service running in parallel with GUI without blocking it
      */
     void setupGameService(){
-        this.task = new Task<Void>() {
+        this.task = new Task<>() {
             protected Void call() throws Exception {
                 runGame();
                 return null;
             }
         };
-        this.gameService = new Service<Void>() {
+        this.gameService = new Service<>() {
             @Override
             protected Task<Void> createTask() {
                 return task;
@@ -230,26 +233,21 @@ public class Runner extends Application{
     }
 
     public Boolean receivedGameOver(PosXY[] move){
-        if(move[0].getX().equals(-1) &&
+        return move[0].getX().equals(-1) &&
                 move[0].getY().equals(-1) &&
                 move[1].getX().equals(-1) &&
-                move[1].getY().equals(-1))
-            return true;
-        return false;
+                move[1].getY().equals(-1);
     }
 
     /**
      * retrieve a valid move from GUI
-     * @throws Exception
+     * @throws Exception Interrupted exception from linked blocking queue
      */
     private void getMove() throws Exception {
-        while (true){
+        do {
             this.gameScreen.getBoardPane().getOutMoveReady().take();
             this.move = this.gameScreen.getBoardPane().getMove();
-            if (this.board.isMoveLegal(this.color, this.move)) {
-                break;
-            }
-        }
+        } while (!this.board.isMoveLegal(this.color, this.move));
     }
 
     private void setAddress(final Stage stage){
@@ -257,7 +255,7 @@ public class Runner extends Application{
             /* get address from user to connect to in the GUI*/
             this.address = this.ms.getAddressTextField().getText();
         }catch(Exception e){
-            System.out.println("[client/Runner] address number wrong");
+            LOGGER.log(Level.WARNING, "Address number wrong");
             this.ms.setAddressTextField(new TextField("Try again"));
             this.ms.getAddressTextField().setOnAction(this.ms.getAddressTFEventHandler());
             this.ms.remoteGameMenu(stage);

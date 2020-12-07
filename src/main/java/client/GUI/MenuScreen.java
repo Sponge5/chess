@@ -12,7 +12,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.input.MouseEvent;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class MenuScreen{
+    private static final Logger LOGGER = Logger.getLogger("[MenuScreen]");
     private Scene scene;
     private Text titleText;
     private GridPane pane;
@@ -52,32 +56,32 @@ public class MenuScreen{
         switch(i){
             case 0:
                 return (MouseEvent) -> {
-                        System.out.println("[MenuScreen] BackToMainMenu Button clicked");
+                        LOGGER.log(Level.ALL, "BackToMainMenu Button clicked");
                         mainMenu(stage);
                 };
             case 1:
                 return (MouseEvent) -> {
-                        System.out.println("[MenuScreen] NewGame Button clicked");
+                        LOGGER.log(Level.ALL, "NewGame Button clicked");
                         newGameMenu(stage);
                 };
             case 2:
                 return (MouseEvent) -> {
-                        System.out.println("[MenuScreen] LoadGame Button clicked");
+                        LOGGER.log(Level.ALL, "LoadGame Button clicked");
                         loadGameMenu(stage);
                 };
             case 3:
                 return (MouseEvent) -> {
-                        System.out.println("[MenuScreen] WatchGame Button clicked");
+                        LOGGER.log(Level.ALL, "WatchGame Button clicked");
                         watchGameMenu(stage);
                 };
             case 4:
                 return (MouseEvent) -> {
-                        System.out.println("[MenuScreen] LocalGame Button clicked");
+                        LOGGER.log(Level.ALL, "LocalGame Button clicked");
                         localGameMenu(stage);
                 };
             case 5:
                 return (MouseEvent) -> {
-                        System.out.println("[MenuScreen] RemoteGame Button clicked");
+                        LOGGER.log(Level.ALL, "RemoteGame Button clicked");
                         remoteGameMenu(stage);
                 };
             default:

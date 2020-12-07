@@ -4,8 +4,11 @@ import logic.Move;
 import logic.PlayerColor;
 
 import java.net.ServerSocket;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class Runner implements Runnable{
+    private static Logger LOGGER = Logger.getLogger("[server/Runner]");
     private Boolean twoClients;
     private ServerSocket serverSocket;
     private ServerSocket serverSocket2;
@@ -42,15 +45,15 @@ public class Runner implements Runnable{
     }
     public void twoPlayerGame() throws Exception{
         while(true) {
-            System.out.println("[server/Runner] waiting for move from first connection");
+            LOGGER.log(Level.ALL, "Waiting for move from first connection");
             Move move = this.firstCon.getInMove().take();
-            System.out.println("[server/Runner] " + move.toString());
+            LOGGER.log(Level.INFO, "Move: " + move.toString());
             this.secondCon.getOutMove().put(move);
             if(this.firstCon.getBoard().isOver())
                 break;
-            System.out.println("[server/Runner] waiting for move from second connection");
+            LOGGER.log(Level.ALL, "Waiting for move from second connection");
             move = this.secondCon.getInMove().take();
-            System.out.println("[server/Runner] " + move.toString());
+            LOGGER.log(Level.INFO, "Move: " + move.toString());
             this.firstCon.getOutMove().put(move);
             if(this.secondCon.getBoard().isOver())
                 break;

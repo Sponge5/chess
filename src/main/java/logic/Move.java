@@ -13,11 +13,6 @@ public class Move {
         this.dest = null;
         this.isSpecial = false;
     }
-    public Move(Integer srcX, Integer srcY, Integer destX, Integer destY){
-        this.src = new PosXY(srcX, srcY);
-        this.dest = new PosXY(destX, destY);
-        this.isSpecial = false;
-    }
     public Move(PosXY src, PosXY dest){
         this.src = src;
         this.dest = dest;

@@ -16,14 +16,14 @@ import logic.PosXY;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+/* TODO change tile color on click */
+/* TODO flip board based on color */
 public class BoardPane extends GridPane {
     private Button[][] squareButtons;
     private EventHandler<MouseEvent> gridButtonHandler;
     private Integer[][] state;
     private Move move;
     private LinkedBlockingQueue<Boolean> outMoveReady;
-
-    /*TODO flip board based on color */
 
     /**
      * Constructor builds BoardPane based on starting board state

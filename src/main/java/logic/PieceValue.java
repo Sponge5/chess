@@ -8,10 +8,10 @@ public enum PieceValue {
     QUEEN (5),
     KING (6);
 
-    public int value;
+    public int n;
 
     PieceValue(int value){
-        this.value = value;
+        this.n = value;
     }
 
     @Override

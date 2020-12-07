@@ -4,14 +4,16 @@ import client.communication.ClientCommunication;
 import logic.Board;
 import logic.Move;
 import logic.PlayerColor;
-import logic.PosXY;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Connection extends Thread{
+    private static final Logger LOGGER = Logger.getLogger("[Connection]");
     private ServerSocket serverSocket;
     private BufferedReader inFromClient;
     private DataOutputStream outToClient;
@@ -32,11 +34,9 @@ public class Connection extends Thread{
 
     public void run() {
         try {
-            System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
-                    "] waiting for connection from client");
+            LOGGER.log(Level.INFO, "Server waiting @ " + this.serverSocket.getLocalPort() + " for connection from client");
             this.conSocket = this.serverSocket.accept();
-            System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
-                    "] accepted connection from client");
+            LOGGER.log(Level.INFO, "Server @ " + this.serverSocket.getLocalPort() + " accepted connection from client");
             this.inFromClient = new BufferedReader(
                     new InputStreamReader(this.conSocket.getInputStream()));
             this.outToClient = new DataOutputStream(
@@ -46,19 +46,17 @@ public class Connection extends Thread{
                     sendMove();
                 }
                 while(true){
-                    System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
-                    "] Server waiting for move from client...");
+                    LOGGER.log(Level.ALL, "Connection @ " + this.serverSocket.getLocalPort() +
+                    " waiting for move from client...");
                     recvMove();
                     sendMove();
                 }
             }else{
                 /* single client */
                 while (true) {
-                    System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
-                    "] Server waiting for move from client...");
+                    LOGGER.log(Level.ALL, "Connection @ " + this.serverSocket.getLocalPort() + " waiting for move from client...");
                     recvMove();
-                    this.color = this.color.equals(PlayerColor.WHITE) ?
-                            PlayerColor.BLACK : PlayerColor.WHITE;
+                    this.color = this.color.equals(PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
                 }
             }
         } catch (Exception e) {
@@ -70,9 +68,8 @@ public class Connection extends Thread{
         Move move;
         while (true) {
             String moveString = this.inFromClient.readLine();
-            System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
-                    "] Server received move:\n" + moveString);
-            move = ClientCommunication.posFromString(moveString);
+            LOGGER.log(Level.INFO, "Connection @ " + this.serverSocket.getLocalPort() + " received move: " + moveString);
+            move = ClientCommunication.moveFromString(moveString);
             if (this.board.isMoveLegal(this.color, move)) {
                 this.board.move(move);
                 this.outToClient.writeBytes("ok\n");
@@ -85,8 +82,7 @@ public class Connection extends Thread{
     }
     private void sendMove() throws Exception{
         Move move = this.outMove.take();
-        System.out.println("[Connection @ " + this.serverSocket.getLocalPort() +
-                "] Server sending move to client");
+        LOGGER.log(Level.INFO, "Connection @ " + this.serverSocket.getLocalPort() + " sending move to client");
         this.outToClient.writeBytes(move.getSrc().toString() + " " + move.getDest().toString());
     }
     public LinkedBlockingQueue<Move> getInMove() {

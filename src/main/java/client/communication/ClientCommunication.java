@@ -9,8 +9,11 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class ClientCommunication implements Runnable{
+    private static final Logger LOGGER = Logger.getLogger("[ClientCommunication]");
     private String address;
     private Integer port;
     private Socket clientSocket;
@@ -30,8 +33,8 @@ public class ClientCommunication implements Runnable{
      * @param color of player playing on client
      */
     public ClientCommunication(String address, Integer port, Boolean remote, PlayerColor color){
-        System.out.println("[ClientComm] construct address: " + address);
-        System.out.println("[ClientComm] construct port: " + port.toString());
+        LOGGER.log(Level.INFO, "Construct address: " + address);
+        LOGGER.log(Level.INFO, "Construct port: " + port.toString());
         this.address = address;
         this.port = port;
         this.remote = remote;
@@ -68,7 +71,7 @@ public class ClientCommunication implements Runnable{
             try {
                 this.clientSocket = new Socket(this.address, this.port);
             } catch (Exception e) {
-                System.out.println("[ClientCommunication] Socket() threw exception");
+                LOGGER.log(Level.WARNING, "Socket() threw exception");
                 this.clientSocket = new Socket("localhost", this.port);
             }
         }
@@ -110,7 +113,7 @@ public class ClientCommunication implements Runnable{
         while(true) {
             /* move is valid according to board logic */
             Move move = this.outMove.take();
-            System.out.println("[ClientCommunication] client sending move to server");
+            LOGGER.log(Level.ALL, "Client sending move to server");
             this.outToServer.writeBytes(move.getSrc().toString() + " " + move.getDest().toString() + "\n");
             String response = this.inFromServer.readLine();
             if (response.equals("ok")) {
@@ -124,25 +127,23 @@ public class ClientCommunication implements Runnable{
 
     /**
      * Receive move from server
-     * @throws Exception
+     * @throws Exception readLine() interrupt
      */
     public void recvMove() throws Exception{
-        System.out.println("[ClientComm] waiting for line");
+        LOGGER.log(Level.ALL, "Waiting for line");
         String moveString = this.inFromServer.readLine();
-        System.out.println("[ClientComm] received line " + moveString);
-        this.inMove.put(posFromString(moveString));
+        LOGGER.log(Level.INFO, "Received line " + moveString);
+        this.inMove.put(moveFromString(moveString));
     }
 
     /**
      * Convert string to Move
-     * @param s 4 numbers separated by spaces
+     * @param s two position in string form (e.g. "A1 A3")
      * @return converted string as Move
      */
-    public static Move posFromString(String s){
-        String[] nums = s.split(" ");
-        Move move = new Move(
-                new PosXY(Integer.parseInt(nums[0]), Integer.parseInt(nums[1])),
-                new PosXY(Integer.parseInt(nums[2]), Integer.parseInt(nums[3])));
+    public static Move moveFromString(String s){
+        String[] poss = s.split(" ");
+        Move move = new Move(new PosXY(poss[0]), new PosXY(poss[1]));
         return move;
     }
 
