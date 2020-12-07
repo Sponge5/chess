@@ -4,6 +4,7 @@ logic/pieces/King.class
 client/Runner$2.class
 client/GUI/ChessSymbols.class
 Main.class
+logic/Move.class
 client/GUI/BoardPane.class
 logic/PieceValue$1.class
 logic/Board.class
