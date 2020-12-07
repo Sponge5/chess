@@ -4,6 +4,8 @@ This repo is supposed to act as a demonstration of my Java skills, *please do tr
 
 **Warning:** This game is barely functional.
 
+![Screenshot](img.jpg)
+
 ## Requirements
 
 Open JDK 10, Maven, JavaFX 11.0.2 (This requirement should be sorted by Maven, as I understand it)
