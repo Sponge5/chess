@@ -18,6 +18,7 @@ import logic.Move;
 import logic.PlayerColor;
 import logic.PosXY;
 
+/* TODO BoardPane gets desynchronized from Board */
 /**
  * Runner class for client
  *

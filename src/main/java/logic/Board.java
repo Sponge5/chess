@@ -3,6 +3,7 @@ package logic;
 import logic.pieces.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,6 +99,7 @@ public class Board {
         ArrayList<Piece> tempPieces = new ArrayList<>(this.pieces);
         while(ret == null && !tempPieces.isEmpty()) {
             Piece p = tempPieces.remove(rand.nextInt(tempPieces.size()));
+            LOGGER.log(Level.ALL, "Finding move for " + p.toString());
             if(p.getColor().equals(color.otherColor()))
                 continue;
             ArrayList<PosXY> dests = p.getAllValidDests(this.state);
@@ -121,19 +123,22 @@ public class Board {
             if (p.getPos().equals(move.getSrc()) && p.getColor().equals(color)) {
                 /* if king is attacked, check if move stops check */
                 if(isKingAttacked(color)){
+                    LOGGER.log(Level.INFO, "CHECK");
                     /* check state after move, if move stops check, return p.moveValid(), otherwise false */
                     /* apply given move on Board and check if king still checked,
                        then return to orig state and return accordingly */
                     Boolean ret = true;
-                    Integer[][] savedState = this.state.clone();
+                    Integer[][] savedState = cloneState(this.state);
                     ArrayList<Piece> savedPieces = new ArrayList<>(this.pieces);
-                    this.state = p.move(move.getDest(), savedState);
-                    if(isKingAttacked(color)) ret = false;
-                    this.state = savedState;
+                    this.state = p.move(move.getDest(), this.state);
+                    if(isKingAttacked(color))
+                        ret = false;
+                    this.state = cloneState(savedState);
                     this.pieces = new ArrayList<>(savedPieces);
-                    return p.moveValid(move.getDest(), this.state);
+                    p.setPos(move.getSrc());
+                    return ret ? p.moveValid(move.getDest(), this.state) : false;
                 }
-                /* check if destination is attacked for king move*/
+                /* check if destination is attacked for king move */
                 if(p instanceof King){
                     if(posAttacked(color, move.getDest())) return false;
                     if(moveIsCastle(p, move)) return true;
@@ -318,6 +323,16 @@ public class Board {
                 this.pieces.add(rook);
             }
         }
+    }
+    
+    public static Integer[][] cloneState(Integer[][] state){
+        Integer[][] clone = new Integer[8][8];
+        int i = 0;
+        for (Integer[] arr : state) {
+            clone[i] = Arrays.copyOf(arr, 8);
+            ++i;
+        }
+        return clone;
     }
 
     public Piece getPiece(PosXY pos){
