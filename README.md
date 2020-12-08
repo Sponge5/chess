@@ -47,8 +47,8 @@ Testing
 * [x] Client creates it's own thread for server in case of game on 1 machine
 * [x] Communication in own thread
 * [x] Add modifiers to class datastructures (for security)
+* [x] Highlight selected piece in GUI
 * [ ] FIX - Check on king against random computer player can desync BoardPane and Board
 * [ ] FIX - Remote game doesn't even remotely work...
-* [ ] Highlight selected piece in GUI
 * [ ] Actually add checkmate and en passant
 * [ ] Replace client/server communication with JSON

@@ -9,6 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import logic.Move;
 import logic.PlayerColor;
@@ -82,8 +83,14 @@ public class BoardPane extends GridPane {
         }
         if (this.move.getSrc() == null) {
             this.move.setSrc((PosXY) ((Node) mouseEvent.getSource()).getUserData());
+            this.squareButtons[this.move.getSrc().getX()][this.move.getSrc().getY()].setBackground(
+                    new Background(new BackgroundFill(Paint.valueOf("green"), null, null)));
         }else{
             this.move.setDest((PosXY) ((Node) mouseEvent.getSource()).getUserData());
+            String color = (this.move.getSrc().getX() + this.move.getSrc().getY()) % 2 != 0 ?
+                "grey" : "white";
+            this.squareButtons[this.move.getSrc().getX()][this.move.getSrc().getY()].setBackground(
+                    new Background(new BackgroundFill(Paint.valueOf(color), null, null)));
             /* get move out to Runner */
             try {
                 this.outMoveReady.put(true);
